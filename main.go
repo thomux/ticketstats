@@ -24,6 +24,6 @@ func readCsvFile(filePath string) [][]string {
 }
 
 func main() {
-	records := readCsvFile("../tasks.csv")
+	records := readCsvFile("JiraExport.csv")
 	fmt.Println(records)
 }
