@@ -1,24 +1,24 @@
+// CLI interface for ticketstats.
 package main
 
 import (
-	"fmt"
+	"flag"
 
 	"github.com/thomux/ticketstats/ticketstats"
 )
 
 func main() {
-	issues := ticketstats.Parse("JiraExport.csv")
+	var path string
+	var project string
+	var component string
+	var split bool
 
-	for _, issue := range issues[:3] {
-		fmt.Println(issue.ToString())
-	}
+	flag.StringVar(&path, "csv", "JiraExport.csv", "path to Jira ticket export")
+	flag.StringVar(&project, "project", "ICAS1", "Jira project key")
+	flag.StringVar(&component, "component", "Linux", "Jira component name")
+	flag.BoolVar(&split, "splitByComponent", true, "split result by components")
 
-	for _, issue := range issues {
-		if issue.ExpectedActivity() == "" {
-			continue
-		}
-		if !issue.AreBookingsValid() {
-			fmt.Println("!!! Issue with wrong bookings:", issue.Key)
-		}
-	}
+	flag.Parse()
+
+	ticketstats.Evaluate(path, project, component, true)
 }

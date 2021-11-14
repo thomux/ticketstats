@@ -9,63 +9,6 @@ import (
 	"time"
 )
 
-/*
-Issue fields
-
-Summary = string
-Issue key = string
-Issue id = string
-Parent id = string
-Issue Type = string
-Status = string
-Priority = string
-Assignee = string
-Creator = string
-Created = date 20/Oct/21 2:24 PM
-Updated = date 13/Nov/21 9:23 AM
-Last Viewed = date 13/Nov/21 9:23 AM
-Affects Version/s = string list 4.5.1
-Fix Version/s = string list 4.7.1
-Component/s = string list Linux
-Log Work = workLog list 8.333333333333334 on ExAc 476355
-Log Work = [entry description (containing ExAc as ExecutionActivity:XXXXXX)];[Date];[user (always asw_qm_service)];[time spend as seconds]
-Original Estimate = float64, convert form seconds to hours 0
-Remaining Estimate = float64, convert form seconds to hours
-Time Spent = float64, convert form seconds to hours 318240
-Σ Original Estimate = float64, convert form seconds to hours 0
-Σ Remaining Estimate = float64, convert form seconds to hours
-Σ Time Spent = float64, convert form seconds to hours 318240
-Security Level = string
-Affects Version/s = string
-Component/s = string list Linux
-Labels = string list IMPL_APPROVED
-Resolution = string
-Resolved = date
-Due Date = date
-
-Outward issue link (Blocks) = string  # ignore for clustering
-Outward issue link (Causes) = string  # ignore for clustering
-Outward issue link (Cloners) = string # cluster, order by creation date
-Outward issue link (Dependency) = string # ignore for clustering
-Outward issue link (Duplicate) = string  # cluster, order by creation date
-Outward issue link (Issue split) = string # cluster, order by creation date
-Outward issue link (Part) = string # cluster, order by creation date
-Outward issue link (Relates) = string # ignore for clustering
-Outward issue link (Relation) = string # ignore for clustering
-Outward issue link (Triggers) = string # ignore for clustering
-Outward issue link (linkIssue) = string # ignore for clustering
-Outward issue link (parent) = string # cluster, order by link
-
-Custom field (External ID) = string
-Custom field (Supplier reference) = string
-Custom field (ICAS Variant) = string
-Custom field (Booking Account) = string
-Custom field (Bug-Category) = string
-
-Childs = Issue list
-
-*/
-
 func readCsvFile(filePath string) [][]string {
 	f, err := os.Open(filePath)
 	if err != nil {
@@ -106,20 +49,19 @@ func convertWorkLog(data string) WorkLog {
 		if strings.HasPrefix(line, "ExecutionActivity:") {
 			exAc = line[18:]
 		}
-
-		if strings.HasPrefix(line, "Info=") {
-			i := strings.LastIndex(line, ";")
-			hours = convertWork(line[i+1:])
-
-			// skip user
-			tmp := line[:i]
-			i = strings.LastIndex(tmp, ";")
-			// get date
-			tmp = tmp[:i]
-			i = strings.LastIndex(tmp, ";")
-			date = convertDate(tmp[i+1:])
-		}
 	}
+
+	line := lines[len(lines)-1]
+	i := strings.LastIndex(line, ";")
+	hours = convertWork(line[i+1:])
+
+	// skip user
+	tmp := line[:i]
+	i = strings.LastIndex(tmp, ";")
+	// get date
+	tmp = tmp[:i]
+	i = strings.LastIndex(tmp, ";")
+	date = convertDate(tmp[i+1:])
 
 	return WorkLog{
 		Hours:    hours,

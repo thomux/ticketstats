@@ -5,17 +5,27 @@ import (
 	"time"
 )
 
+// Work is the data type or logged work time.
+// The unit is hours.
 type Work float64
 
+// WorkLog groups the infos from one logged work time.
 type WorkLog struct {
-	Hours    Work
-	Date     time.Time
+	// worked hours
+	Hours Work
+	// date of time recording
+	Date time.Time
+	// activity (custom value)
 	Activity string
 }
 
+// formatWork converts worked hours to a string.
+// The representation splits the hours to weeks, days and hours
+// for better readability.
 func formatWork(w Work) string {
 	if w < 8 {
-		return fmt.Sprintf("%.fh", w)
+		// short cut for less than one day
+		return fmt.Sprintf("%.2fh", w)
 	}
 
 	days := int(w / 8)
@@ -32,12 +42,13 @@ func formatWork(w Work) string {
 		str += fmt.Sprintf("%dd ", days)
 	}
 	if hours > 0.1 {
-		str += fmt.Sprintf("%.2fh ", hours)
+		str += fmt.Sprintf("%.2fh", hours)
 	}
 
 	return str
 }
 
+// WorkLog.ToString converts a WorkLog to a string for printing.
 func (workLog WorkLog) ToString() string {
 	return fmt.Sprintf("%s: %s - %s\n",
 		workLog.Activity,
@@ -45,6 +56,7 @@ func (workLog WorkLog) ToString() string {
 		formatWork(workLog.Hours))
 }
 
+// Issue groups all needed Jira issue data.
 type Issue struct {
 	Summary              string
 	Key                  string
@@ -93,9 +105,11 @@ type Issue struct {
 	Childs               []Issue
 }
 
+// NewIssue creates a new issue.
 func NewIssue() *Issue {
 	issue := new(Issue)
 
+	// init all lists to avoid nil issues
 	issue.AffectsVersions = make([]string, 0)
 	issue.FixVersions = make([]string, 0)
 	issue.Components = make([]string, 0)
@@ -118,6 +132,12 @@ func NewIssue() *Issue {
 	return issue
 }
 
+// Issue.IsResolved tests if the issue is resolved.
+func (issue *Issue) IsResolved() bool {
+	return issue.Resolved != time.Time{}
+}
+
+// Issue.ToString creates a string representation of the issue for console.
 func (issue *Issue) ToString() string {
 	str := ""
 
@@ -151,22 +171,27 @@ func (issue *Issue) ToString() string {
 		}
 	}
 	if issue.OriginalEstimate > 0 {
-		str += fmt.Sprintf("Original estimate: %s\n", formatWork(issue.OriginalEstimate))
+		str += fmt.Sprintf("Original estimate: %s\n",
+			formatWork(issue.OriginalEstimate))
 	}
 	if issue.RemainingEstimate > 0 {
-		str += fmt.Sprintf("Remaining estimate: %s\n", formatWork(issue.RemainingEstimate))
+		str += fmt.Sprintf("Remaining estimate: %s\n",
+			formatWork(issue.RemainingEstimate))
 	}
 	if issue.TimeSpend > 0 {
 		str += fmt.Sprintf("Time spend: %s\n", formatWork(issue.TimeSpend))
 	}
 	if issue.SumOriginalEstimate > 0 {
-		str += fmt.Sprintf("Sum original estimate: %s\n", formatWork(issue.SumOriginalEstimate))
+		str += fmt.Sprintf("Sum original estimate: %s\n",
+			formatWork(issue.SumOriginalEstimate))
 	}
 	if issue.SumRemainingEstimate > 0 {
-		str += fmt.Sprintf("Sum remaining estimate: %s\n", formatWork(issue.SumRemainingEstimate))
+		str += fmt.Sprintf("Sum remaining estimate: %s\n",
+			formatWork(issue.SumRemainingEstimate))
 	}
 	if issue.SumTimeSpend > 0 {
-		str += fmt.Sprintf("Sum time spend: %s\n", formatWork(issue.SumTimeSpend))
+		str += fmt.Sprintf("Sum time spend: %s\n",
+			formatWork(issue.SumTimeSpend))
 	}
 	if len(issue.Labels) > 0 {
 		str += fmt.Sprintf("Labels: %+v\n", issue.Labels)
@@ -175,7 +200,8 @@ func (issue *Issue) ToString() string {
 		str += fmt.Sprintf("Resolution: %s\n", issue.Resolution)
 	}
 	if issue.Resolved != noDate {
-		str += fmt.Sprintf("Resolved: %s\n", issue.Resolved.Format("2006-01-02"))
+		str += fmt.Sprintf("Resolved: %s\n",
+			issue.Resolved.Format("2006-01-02"))
 	}
 	if issue.Due != noDate {
 		str += fmt.Sprintf("Due: %s\n", issue.Due.Format("2006-01-02"))
