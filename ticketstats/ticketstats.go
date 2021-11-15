@@ -3,7 +3,10 @@
 package ticketstats
 
 import (
+	"fmt"
 	"log"
+	"sort"
+	"strings"
 	"time"
 )
 
@@ -56,6 +59,7 @@ func (ts *TicketStats) generateReport() {
 
 	ts.sanitize()
 	ts.oldBugs()
+	ts.bugs()
 
 	ts.report.Render()
 }
@@ -76,4 +80,58 @@ func (ts *TicketStats) oldBugs() {
 		ts.report.OldBugs = append(ts.report.OldBugs, bug.ToReportIssue(ts.jiraBase))
 	}
 	log.Println("INFO:", len(oldBugs), "old bug tickets.")
+}
+
+func (ts *TicketStats) bugs() {
+	bugs := FilterByType(ts.issues, "Bug")
+	openBugs := OpenTickets(bugs)
+
+	ts.report.Bugs.Count = len(openBugs)
+
+	ts.report.Bugs.Week.Created = len(CreatedLastWeek(bugs))
+	ts.report.Bugs.Week.Resolved = len(ClosedLastWeek(bugs))
+	ts.report.Bugs.Week.Diff = ts.report.Bugs.Week.Created - ts.report.Bugs.Week.Resolved
+
+	ts.report.Bugs.Month.Created = len(CreatedLastMonth(bugs))
+	ts.report.Bugs.Month.Resolved = len(ClosedLastMonth(bugs))
+	ts.report.Bugs.Month.Diff = ts.report.Bugs.Month.Created - ts.report.Bugs.Month.Resolved
+
+	versions := FixVersions(openBugs)
+	securityLevels := SecurityLevels(openBugs)
+	sort.Slice(versions, func(i, j int) bool {
+		return strings.Compare(versions[i], versions[j]) > 0
+	})
+
+	ts.report.Bugs.BugCounts.Versions = versions
+
+	for _, security := range securityLevels {
+		sbs := FilterBySecurityLevel(openBugs, security)
+		values := make([]string, 0)
+		values = append(values, security)
+		sum := 0
+		for _, version := range versions {
+			bs := FilterByFixVersion(sbs, version)
+
+			stat := NewReportBugStats()
+			stat.Count = len(bs)
+			sum += stat.Count
+
+			if stat.Count > 0 {
+				values = append(values, fmt.Sprintf("%d", stat.Count))
+
+				stat.Version = version
+				stat.Security = security
+
+				for _, b := range FilterByPriority(bs, "Critical") {
+					stat.Critical = append(stat.Critical, b.ToReportIssue(ts.jiraBase))
+				}
+
+				ts.report.Bugs.BugStats = append(ts.report.Bugs.BugStats, stat)
+			} else {
+				values = append(values, "")
+			}
+		}
+		values = append(values, fmt.Sprintf("%d", sum))
+		ts.report.Bugs.BugCounts.Values = append(ts.report.Bugs.BugCounts.Values, values)
+	}
 }

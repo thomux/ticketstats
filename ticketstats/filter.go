@@ -21,6 +21,97 @@ func ActiveTickets(issues []*Issue) []*Issue {
 	return active
 }
 
+func OpenTickets(issues []*Issue) []*Issue {
+	result := make([]*Issue, 0)
+	noDate := time.Time{}
+
+	for _, issue := range issues {
+		if issue.Resolved == noDate {
+			result = append(result, issue)
+		}
+	}
+
+	return result
+}
+
+func FixVersions(issues []*Issue) []string {
+	result := make([]string, 0)
+	fixVersions := make(map[string]int)
+
+	for _, issue := range issues {
+		for _, version := range issue.FixVersions {
+			_, ok := fixVersions[version]
+			if !ok {
+				fixVersions[version] = 1
+				result = append(result, version)
+			}
+		}
+	}
+
+	return result
+}
+
+func SecurityLevels(issues []*Issue) []string {
+	result := make([]string, 0)
+	security := make(map[string]int)
+
+	for _, issue := range issues {
+		_, ok := security[issue.SecurityLevel]
+		if !ok {
+			security[issue.SecurityLevel] = 1
+			result = append(result, issue.SecurityLevel)
+		}
+	}
+
+	return result
+}
+
+func contains(slice []string, item string) bool {
+	set := make(map[string]struct{}, len(slice))
+	for _, s := range slice {
+		set[s] = struct{}{}
+	}
+
+	_, ok := set[item]
+	return ok
+}
+
+func FilterByFixVersion(issues []*Issue, fixVersion string) []*Issue {
+	res := make([]*Issue, 0)
+
+	for _, issue := range issues {
+		if contains(issue.FixVersions, fixVersion) {
+			res = append(res, issue)
+		}
+	}
+
+	return res
+}
+
+func FilterBySecurityLevel(issues []*Issue, securityLevel string) []*Issue {
+	res := make([]*Issue, 0)
+
+	for _, issue := range issues {
+		if issue.SecurityLevel == securityLevel {
+			res = append(res, issue)
+		}
+	}
+
+	return res
+}
+
+func FilterByPriority(issues []*Issue, priority string) []*Issue {
+	res := make([]*Issue, 0)
+
+	for _, issue := range issues {
+		if issue.Priority == priority {
+			res = append(res, issue)
+		}
+	}
+
+	return res
+}
+
 // FilterByProject only returns the tickets matching the given project key.
 func FilterByProject(issues []*Issue, project string) []*Issue {
 	res := make([]*Issue, 0)

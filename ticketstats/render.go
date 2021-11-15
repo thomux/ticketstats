@@ -301,10 +301,11 @@ func NewReportIssue() ReportIssue {
 
 // ReportBugs groups the data for the bug report section.
 type ReportBugs struct {
-	Count    int
-	Week     ReportCount
-	Month    ReportCount
-	BugStats []ReportBugStats
+	Count     int
+	Week      ReportCount
+	Month     ReportCount
+	BugStats  []ReportBugStats
+	BugCounts BugCounts
 }
 
 // NewReportBugs initializes a new ReportBugs object.
@@ -314,6 +315,20 @@ func NewReportBugs() ReportBugs {
 	report.BugStats = make([]ReportBugStats, 0)
 
 	return report
+}
+
+// BugCounts groups the bug numbers by version
+type BugCounts struct {
+	Versions []string
+	Values   [][]string
+}
+
+// BugCounts initializes a new BugCounts object.
+func NewBugCounts() BugCounts {
+	var bugCounts BugCounts
+	bugCounts.Versions = make([]string, 0)
+	bugCounts.Values = make([][]string, 0)
+	return bugCounts
 }
 
 // ReportCount groups the count changes for a issues type.

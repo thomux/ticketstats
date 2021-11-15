@@ -604,3 +604,27 @@ func TestLastYear(t *testing.T) {
 		t.Fail()
 	}
 }
+
+func TestOpenTickets(t *testing.T) {
+	t.Fail()
+}
+
+func TestFixVersions(t *testing.T) {
+	t.Fail()
+}
+
+func TestSecurityLevels(t *testing.T) {
+	t.Fail()
+}
+
+func TestFilterByFixVersion(t *testing.T) {
+	t.Fail()
+}
+
+func TestFilterBySecurityLevel(t *testing.T) {
+	t.Fail()
+}
+
+func TestFilterByPriority(t *testing.T) {
+	t.Fail()
+}
