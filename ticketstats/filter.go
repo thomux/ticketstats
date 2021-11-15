@@ -8,25 +8,26 @@ import (
 
 // ActiveTickets returns all active tickets.
 func ActiveTickets(issues []*Issue) []*Issue {
-	active := make([]*Issue, 0)
 	noDate := time.Time{}
 
-	for _, issue := range issues {
-		if issue.Resolved == noDate ||
-			lastMonth(issue.Updated) {
-			active = append(active, issue)
-		}
-	}
-
-	return active
+	return Filter(issues, func(issue *Issue) bool {
+		return issue.Resolved == noDate || lastMonth(issue.Updated)
+	})
 }
 
 func OpenTickets(issues []*Issue) []*Issue {
-	result := make([]*Issue, 0)
 	noDate := time.Time{}
 
+	return Filter(issues, func(issue *Issue) bool {
+		return issue.Resolved == noDate
+	})
+}
+
+func Filter(issues []*Issue, test func(issue *Issue) bool) []*Issue {
+	result := make([]*Issue, 0)
+
 	for _, issue := range issues {
-		if issue.Resolved == noDate {
+		if test(issue) {
 			result = append(result, issue)
 		}
 	}
@@ -77,198 +78,106 @@ func contains(slice []string, item string) bool {
 }
 
 func FilterByFixVersion(issues []*Issue, fixVersion string) []*Issue {
-	res := make([]*Issue, 0)
-
-	for _, issue := range issues {
-		if contains(issue.FixVersions, fixVersion) {
-			res = append(res, issue)
-		}
-	}
-
-	return res
+	return Filter(issues, func(issue *Issue) bool {
+		return contains(issue.FixVersions, fixVersion)
+	})
 }
 
 func FilterBySecurityLevel(issues []*Issue, securityLevel string) []*Issue {
-	res := make([]*Issue, 0)
-
-	for _, issue := range issues {
-		if issue.SecurityLevel == securityLevel {
-			res = append(res, issue)
-		}
-	}
-
-	return res
+	return Filter(issues, func(issue *Issue) bool {
+		return issue.SecurityLevel == securityLevel
+	})
 }
 
 func FilterByPriority(issues []*Issue, priority string) []*Issue {
-	res := make([]*Issue, 0)
-
-	for _, issue := range issues {
-		if issue.Priority == priority {
-			res = append(res, issue)
-		}
-	}
-
-	return res
+	return Filter(issues, func(issue *Issue) bool {
+		return issue.Priority == priority
+	})
 }
 
 // FilterByProject only returns the tickets matching the given project key.
 func FilterByProject(issues []*Issue, project string) []*Issue {
-	res := make([]*Issue, 0)
-
-	for _, issue := range issues {
-		if strings.HasPrefix(issue.Key, project) {
-			res = append(res, issue)
-		}
-	}
-
-	return res
+	return Filter(issues, func(issue *Issue) bool {
+		return strings.HasPrefix(issue.Key, project)
+	})
 }
 
 // CreatedLastWeek returns all issues created during the last 7 days.
 func CreatedLastWeek(issues []*Issue) []*Issue {
-	res := make([]*Issue, 0)
-
-	for _, issue := range issues {
-		if lastWeek(issue.Created) {
-			res = append(res, issue)
-		}
-	}
-
-	return res
+	return Filter(issues, func(issue *Issue) bool {
+		return lastWeek(issue.Created)
+	})
 }
 
 // CreatedLastMonth returns all issues created during the last month.
 func CreatedLastMonth(issues []*Issue) []*Issue {
-	res := make([]*Issue, 0)
-
-	for _, issue := range issues {
-		if lastMonth(issue.Created) {
-			res = append(res, issue)
-		}
-	}
-
-	return res
+	return Filter(issues, func(issue *Issue) bool {
+		return lastMonth(issue.Created)
+	})
 }
 
 // CreatedLastQuarter returns all issues created during the last three month.
 func CreatedLastQuarter(issues []*Issue) []*Issue {
-	res := make([]*Issue, 0)
-
-	for _, issue := range issues {
-		if lastQuarter(issue.Created) {
-			res = append(res, issue)
-		}
-	}
-
-	return res
+	return Filter(issues, func(issue *Issue) bool {
+		return lastQuarter(issue.Created)
+	})
 }
 
 // CreatedLastYear returns all issues created during the last year
 func CreatedLastYear(issues []*Issue) []*Issue {
-	res := make([]*Issue, 0)
-
-	for _, issue := range issues {
-		if lastYear(issue.Created) {
-			res = append(res, issue)
-		}
-	}
-
-	return res
+	return Filter(issues, func(issue *Issue) bool {
+		return lastYear(issue.Created)
+	})
 }
 
 // ClosedLastWeek returns all issues resolved during the last week.
 func ClosedLastWeek(issues []*Issue) []*Issue {
-	res := make([]*Issue, 0)
-
-	for _, issue := range issues {
-		if lastWeek(issue.Resolved) {
-			res = append(res, issue)
-		}
-	}
-
-	return res
+	return Filter(issues, func(issue *Issue) bool {
+		return lastWeek(issue.Resolved)
+	})
 }
 
 // ClosedLastMonth returns all issues resolved during the last month.
 func ClosedLastMonth(issues []*Issue) []*Issue {
-	res := make([]*Issue, 0)
-
-	for _, issue := range issues {
-		if lastMonth(issue.Resolved) {
-			res = append(res, issue)
-		}
-	}
-
-	return res
+	return Filter(issues, func(issue *Issue) bool {
+		return lastMonth(issue.Resolved)
+	})
 }
 
 // ClosedLastQuarter returns all issues resolved during the last three month.
 func ClosedLastQuarter(issues []*Issue) []*Issue {
-	res := make([]*Issue, 0)
-
-	for _, issue := range issues {
-		if lastQuarter(issue.Resolved) {
-			res = append(res, issue)
-		}
-	}
-
-	return res
+	return Filter(issues, func(issue *Issue) bool {
+		return lastQuarter(issue.Resolved)
+	})
 }
 
 // ClosedLastYear returns all issues resolved during the last year.
 func ClosedLastYear(issues []*Issue) []*Issue {
-	res := make([]*Issue, 0)
-
-	for _, issue := range issues {
-		if lastYear(issue.Resolved) {
-			res = append(res, issue)
-		}
-	}
-
-	return res
+	return Filter(issues, func(issue *Issue) bool {
+		return lastYear(issue.Resolved)
+	})
 }
 
 // OlderThanOneMonth returns all tickets older than one month.
 func OlderThanOneMonth(issues []*Issue) []*Issue {
-	res := make([]*Issue, 0)
 	lm := time.Now().AddDate(0, -1, 0)
-
-	for _, issue := range issues {
-		if issue.Created.Before(lm) {
-			res = append(res, issue)
-		}
-	}
-
-	return res
+	return Filter(issues, func(issue *Issue) bool {
+		return issue.Created.Before(lm)
+	})
 }
 
 // FilterByType returns all issues matching the given type.
 func FilterByType(issues []*Issue, ticketType string) []*Issue {
-	res := make([]*Issue, 0)
-
-	for _, issue := range issues {
-		if issue.Type == ticketType {
-			res = append(res, issue)
-		}
-	}
-
-	return res
+	return Filter(issues, func(issue *Issue) bool {
+		return issue.Type == ticketType
+	})
 }
 
 // FilterByComponent returns all issues matching the given component.
 func FilterByComponent(issues []*Issue, component string) []*Issue {
-	res := make([]*Issue, 0)
-
-	for _, issue := range issues {
-		for _, c := range issue.Components {
-			if c == component {
-				res = append(res, issue)
-			}
-		}
-	}
-
-	return res
+	return Filter(issues, func(issue *Issue) bool {
+		return contains(issue.Components, component)
+	})
 }
 
 // OrderByCreated orders the issues by created date.

@@ -628,3 +628,7 @@ func TestFilterBySecurityLevel(t *testing.T) {
 func TestFilterByPriority(t *testing.T) {
 	t.Fail()
 }
+
+func TestFilter(t *testing.T) {
+	t.Fail()
+}
