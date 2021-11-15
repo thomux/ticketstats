@@ -45,7 +45,7 @@ func TestAreBookingsValid(t *testing.T) {
 		Date:     time.Now(),
 	})
 
-	valid, _ := issue.AreBookingsValid()
+	valid, _ := issue.AreBookingsValid(false)
 
 	if !valid {
 		log.Println("TEST: issue should be valid")
@@ -58,7 +58,7 @@ func TestAreBookingsValid(t *testing.T) {
 		Date:     time.Now(),
 	})
 
-	valid, logs := issue.AreBookingsValid()
+	valid, logs := issue.AreBookingsValid(false)
 
 	if valid {
 		log.Println("TEST: issue should be invalid")
@@ -112,7 +112,7 @@ func TestSanitize(t *testing.T) {
 
 	issues = append(issues, issue)
 
-	result := Sanitize(issues)
+	result := Sanitize(issues, false)
 
 	if len(result.NoActivity) != 1 {
 		log.Println("TEST: wrong count of issues with no activity")
@@ -127,17 +127,17 @@ func TestSanitize(t *testing.T) {
 		log.Println("TEST: wrong count of issues with invalid bookings")
 		t.Fail()
 	}
-	ls, ok := result.InvalidWorkLogs["B"]
-	if !ok {
+	il := result.InvalidWorkLogs[0]
+	if il.Issue.Key != "B" {
 		log.Println("TEST: wrong issue with invalid bookings")
 		t.Fail()
 	}
-	if len(ls) != 1 {
-		log.Println("TEST: wrong count of invalid bookings")
-		t.Fail()
-	}
-	if ls[0].Activity != "123456" {
+	if il.Logs[0].Activity != "123456" {
 		log.Println("TEST: wrong invalid work log")
 		t.Fail()
 	}
+}
+
+func TestIgnoreOld(t *testing.T) {
+	t.Fail()
 }
