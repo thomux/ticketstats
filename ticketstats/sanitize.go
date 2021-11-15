@@ -84,9 +84,7 @@ func Sanitize(issues []*Issue, ignoreOld bool) SanitizeResult {
 			valid, logs := issue.AreBookingsValid(ignoreOld)
 			if !valid {
 				invalidLog := NewInvalidWorkLog(issue)
-				for _, l := range logs {
-					invalidLog.Logs = append(invalidLog.Logs, l)
-				}
+				invalidLog.Logs = append(invalidLog.Logs, logs...)
 				invalidLogs = append(invalidLogs, invalidLog)
 			}
 		} else {
