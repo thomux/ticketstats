@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-//go:embed report_template.html
+//go:embed report.tmpl
 var reportTemplate string
 
 // Report groups all data needed to render the HTML report.
