@@ -187,6 +187,13 @@ func OrderByCreated(issues []*Issue) {
 	})
 }
 
+// OrderByCreated orders the issues by created date.
+func OrderByDue(issues []*Issue) {
+	sort.Slice(issues, func(i, j int) bool {
+		return issues[i].Due.Before(issues[j].Due)
+	})
+}
+
 // Age returns the difference from now to the given date as days.
 func Age(date time.Time) int {
 	diff := time.Since(date)

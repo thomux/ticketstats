@@ -62,6 +62,7 @@ func (ts *TicketStats) generateReport() {
 	ts.sanitize()
 	ts.oldBugs()
 	ts.bugs()
+	ts.features()
 
 	ts.report.Render()
 }
@@ -135,5 +136,20 @@ func (ts *TicketStats) bugs() {
 		}
 		values = append(values, fmt.Sprintf("%d", sum))
 		ts.report.Bugs.BugCounts.Values = append(ts.report.Bugs.BugCounts.Values, values)
+	}
+}
+
+func (ts *TicketStats) features() {
+	features := FilterByType(ts.issues, "New Feature")
+	openFeatures := OpenTickets(features)
+	OrderByDue(openFeatures)
+
+	PrintClusters(openFeatures, true)
+
+	for _, feature := range openFeatures {
+		rf := feature.ToReportIssue(ts.jiraBase)
+		if len(rf.Parents) == 0 {
+			ts.report.Features = append(ts.report.Features, rf)
+		}
 	}
 }

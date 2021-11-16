@@ -206,6 +206,7 @@ type ReportIssue struct {
 	AtRisk      bool
 	FTE         string
 	HasChilds   bool
+	Overtime    bool
 	Childs      []ReportIssue
 	Parents     []Link
 }
@@ -235,24 +236,27 @@ func (issue *Issue) ToReportIssue(jiraBaseUrl string) ReportIssue {
 	rissue.Assignee = issue.Assignee
 	rissue.Status = issue.Status
 	rissue.FixVersions = issue.FixVersions
-	if issue.OriginalEstimate > 0.0 {
+	if issue.OriginalEstimate > 0.001 {
 		rissue.Estimate = formatWork(issue.OriginalEstimate)
 	}
-	if issue.OriginalEstimate > 0.0 {
+	if issue.TimeSpend > 0.001 {
 		rissue.TimeSpend = formatWork(issue.TimeSpend)
 	}
 	if issue.OriginalEstimate > 0.0 && issue.TimeSpend > 0.0 {
 		rissue.HasTime = true
 		rissue.Progress = int((issue.TimeSpend / issue.OriginalEstimate) * 100.0)
 		rissue.FTE = covertToFTE(issue.Due, issue.OriginalEstimate-issue.TimeSpend)
+		if issue.TimeSpend > issue.OriginalEstimate {
+			rissue.Overtime = true
+		}
 	}
 	if len(issue.Childs) > 0 {
-		rissue.HasChilds = true
 		parent := Link{
 			Url:  jiraBaseUrl + issue.Key,
 			Name: issue.Key,
 		}
 		rissue.Childs = flattenTree(issue, parent, jiraBaseUrl)
+		rissue.HasChilds = (len(rissue.Childs) > 0)
 	}
 
 	return rissue
@@ -264,8 +268,14 @@ func flattenTree(issue *Issue, parent Link, jiraBaseUrl string) []ReportIssue {
 	for _, child := range issue.Childs {
 		rissue := child.ToReportIssue(jiraBaseUrl)
 		rissue.Parents = append(rissue.Parents, parent)
-		childs = append(childs, rissue)
-		childs = append(childs, rissue.Childs...)
+		if rissue.Status != "Closed" {
+			childs = append(childs, rissue)
+		}
+		for _, rc := range rissue.Childs {
+			if rc.Status != "Closed" {
+				childs = append(childs, rc)
+			}
+		}
 	}
 
 	return childs

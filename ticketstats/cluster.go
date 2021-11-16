@@ -81,9 +81,13 @@ func PrintClusters(issues []*Issue, shorten bool) {
 	for i, issue := range issues {
 		if len(issue.Childs) > 0 {
 			fmt.Println("Cluster", i)
-			fmt.Println(issue.Key, issue.Summary, issue.Type)
+			fmt.Println(issue.Key, issue.Id, issue.Summary, "-", issue.Created.Format("2006-01-02"),
+				issue.LinkCloners, issue.LinkDuplicates, issue.LinkIssueSplits,
+				issue.LinkParents, issue.LinkParts, issue.Parent)
 			for j, child := range issue.Childs {
-				fmt.Println("|-", child.Key, child.Summary, child.Type)
+				fmt.Println("|-", child.Key, child.Id, child.Summary, "-", child.Created.Format("2006-01-02"),
+					child.LinkCloners, child.LinkDuplicates, child.LinkIssueSplits,
+					child.LinkParents, child.LinkParts, child.Parent)
 				if shorten && j > 9 {
 					fmt.Println("   ...", len(issue.Childs), "childs")
 					break
