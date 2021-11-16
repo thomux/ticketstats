@@ -36,6 +36,8 @@ func Evaluate(path string,
 		splitByComponent = false
 	}
 
+	ClusterIssues(issues)
+
 	ts := TicketStats{
 		jiraBase: jiraBase,
 		issues:   issues,
