@@ -11,7 +11,7 @@ func ActiveTickets(issues []*Issue) []*Issue {
 	noDate := time.Time{}
 
 	return Filter(issues, func(issue *Issue) bool {
-		return issue.Resolved == noDate || lastMonth(issue.Updated)
+		return (issue.Resolved == noDate && issue.Status != "Closed") || lastMonth(issue.Updated)
 	})
 }
 
@@ -19,7 +19,7 @@ func OpenTickets(issues []*Issue) []*Issue {
 	noDate := time.Time{}
 
 	return Filter(issues, func(issue *Issue) bool {
-		return issue.Resolved == noDate
+		return issue.Resolved == noDate && issue.Status != "Closed"
 	})
 }
 
