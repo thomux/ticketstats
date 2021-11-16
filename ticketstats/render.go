@@ -189,6 +189,7 @@ type ReportIssue struct {
 	JiraUrl     string
 	Key         string
 	Summary     string
+	Activity    string
 	HasDue      bool
 	Due         string
 	Created     string
@@ -218,6 +219,7 @@ func (issue *Issue) ToReportIssue(jiraBaseUrl string) ReportIssue {
 	}
 	rissue.Key = issue.Key
 	rissue.Summary = issue.Summary
+	rissue.Activity = issue.CustomActivity
 	if issue.Due == noDate {
 		rissue.HasDue = false
 	} else {
