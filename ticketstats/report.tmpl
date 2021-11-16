@@ -24,7 +24,10 @@
                     <td>Issue</td>
                     <td>Age</td>
                     <td>Labels</td>
+                    <td>Status</td>
                     <td>Creator</td>
+                    <td>Assignee</td>
+
                 </tr>
             </thead>
             <tbody>
@@ -42,7 +45,11 @@
                         </span>
                         {{ end }}
                     </td>
+                    <td>
+                        <span class="tag is-info">{{ .Status }}</span>
+                    </td>
                     <td>{{ .Creator }}</td>
+                    <td>{{ .Assignee }}</td>
                 </tr>
                 {{ end }}
             </tbody>

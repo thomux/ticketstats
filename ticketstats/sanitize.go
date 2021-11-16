@@ -1,6 +1,8 @@
 package ticketstats
 
 import (
+	"log"
+	"strings"
 	"time"
 )
 
@@ -30,7 +32,7 @@ func NewInvalidWorkLog(issue *Issue) InvalidWorkLog {
 // The first value of the result is true if all logs are ok, the second
 // is a list of invalid logs.
 func (issue *Issue) AreBookingsValid(ignoreOld bool) (bool, []WorkLog) {
-	activity := issue.CustomActivity
+	activity := strings.TrimSpace(issue.CustomActivity)
 	valid := true
 	invalidLogs := make([]WorkLog, 0)
 
@@ -38,16 +40,16 @@ func (issue *Issue) AreBookingsValid(ignoreOld bool) (bool, []WorkLog) {
 		return true, invalidLogs
 	}
 
-	start := time.Now().AddDate(0, -1, -5)
+	start := time.Now().AddDate(0, 0, -time.Now().Day()-1)
 	for _, l := range issue.LogWorks {
 		if ignoreOld && l.Date.Before(start) {
 			continue
 		}
 		if l.Activity == "" {
-			valid = false
-			invalidLogs = append(invalidLogs, l)
+			log.Println("ERROR: WorkLog without activity!", l.ToString(), issue.Key)
 		}
-		if l.Activity != activity {
+
+		if strings.Compare(l.Activity, activity) != 0 {
 			valid = false
 			invalidLogs = append(invalidLogs, l)
 		}
@@ -72,7 +74,9 @@ func Sanitize(issues []*Issue, ignoreOld bool) SanitizeResult {
 				invalidLogs = append(invalidLogs, invalidLog)
 			}
 		} else {
-			noActivity = append(noActivity, issue)
+			if issue.Status != "Closed" {
+				noActivity = append(noActivity, issue)
+			}
 		}
 	}
 
