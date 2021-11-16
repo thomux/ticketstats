@@ -187,7 +187,7 @@ func Parse(path string) []*Issue {
 			case "Custom field (Booking Account)":
 				issue.CustomActivity = val
 			case "Custom field (Bug-Category)":
-				issue.CustomActivity = val
+				issue.CustomCategory = val
 			}
 		}
 		issues = append(issues, issue)
