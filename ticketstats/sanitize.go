@@ -1,7 +1,6 @@
 package ticketstats
 
 import (
-	"log"
 	"time"
 )
 
@@ -27,32 +26,17 @@ func NewInvalidWorkLog(issue *Issue) InvalidWorkLog {
 	return invalidLog
 }
 
-func (issue *Issue) ExpectedActivity() string {
-	activity := issue.CustomActivity
-	if activity == "" {
-		log.Println("WARNING: Activity not defined in ticket!", issue.Key)
-		for _, l := range issue.LogWorks {
-			if l.Activity != "" {
-				activity = l.Activity
-				break
-			}
-		}
-	}
-
-	if activity == "" {
-		log.Println("WARNING: Na activity found for ticket!", issue.Key)
-	}
-
-	return activity
-}
-
 // AreBookingsValid checks if the work logs of the issue are consistent.
 // The first value of the result is true if all logs are ok, the second
 // is a list of invalid logs.
 func (issue *Issue) AreBookingsValid(ignoreOld bool) (bool, []WorkLog) {
-	activity := issue.ExpectedActivity()
+	activity := issue.CustomActivity
 	valid := true
 	invalidLogs := make([]WorkLog, 0)
+
+	if activity == "" {
+		return true, invalidLogs
+	}
 
 	start := time.Now().AddDate(0, -1, -5)
 	for _, l := range issue.LogWorks {
@@ -79,7 +63,7 @@ func Sanitize(issues []*Issue, ignoreOld bool) SanitizeResult {
 
 	for _, issue := range issues {
 		// Check if activity of ticket can be found
-		if issue.ExpectedActivity() != "" {
+		if issue.CustomActivity != "" {
 			// Check tickets for wrong time bookings
 			valid, logs := issue.AreBookingsValid(ignoreOld)
 			if !valid {

@@ -6,28 +6,6 @@ import (
 	"time"
 )
 
-func TestExpectedActivity(t *testing.T) {
-	issue := NewIssue()
-	issue.CustomActivity = "123457"
-
-	if issue.ExpectedActivity() != "123457" {
-		log.Println("TEST: custom activity")
-		t.Fail()
-	}
-
-	issue = NewIssue()
-	issue.LogWorks = append(issue.LogWorks, WorkLog{
-		Activity: "123456",
-		Hours:    1.5,
-		Date:     time.Now(),
-	})
-
-	if issue.ExpectedActivity() != "123456" {
-		log.Println("TEST: derived from work")
-		t.Fail()
-	}
-}
-
 func TestAreBookingsValid(t *testing.T) {
 	issue := NewIssue()
 	issue.Key = "A"
