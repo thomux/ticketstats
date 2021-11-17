@@ -79,6 +79,20 @@ func (ts *TicketStats) sanitize() {
 
 func (ts *TicketStats) oldBugs() {
 	oldBugs := OldBugs(ts.active)
+
+	filterStates := []string{"Verification", "Acceptace", "Integration"}
+
+	oldBugs = Filter(oldBugs, func(issue *Issue) bool {
+		keep := true
+		for _, status := range filterStates {
+			if issue.Status == status {
+				keep = false
+				break
+			}
+		}
+		return keep
+	})
+
 	OrderByCreated(oldBugs)
 	for _, bug := range oldBugs {
 		ts.report.OldBugs = append(ts.report.OldBugs, bug.ToReportIssue(ts.jiraBase))
@@ -89,6 +103,19 @@ func (ts *TicketStats) oldBugs() {
 func (ts *TicketStats) bugs() {
 	bugs := FilterByType(ts.issues, "Bug")
 	openBugs := OpenTickets(bugs)
+
+	filterStates := []string{"Verification", "Acceptace", "Integration"}
+
+	openBugs = Filter(openBugs, func(issue *Issue) bool {
+		keep := true
+		for _, status := range filterStates {
+			if issue.Status == status {
+				keep = false
+				break
+			}
+		}
+		return keep
+	})
 
 	ts.report.Bugs.Count = len(openBugs)
 
@@ -126,8 +153,10 @@ func (ts *TicketStats) bugs() {
 				stat.Version = version
 				stat.Security = security
 
-				for _, b := range FilterByPriority(bs, "Critical") {
-					stat.Critical = append(stat.Critical, b.ToReportIssue(ts.jiraBase))
+				OrderByStatus(bs)
+				OrderByPriority(bs)
+				for _, b := range bs {
+					stat.Bugs = append(stat.Bugs, b.ToReportIssue(ts.jiraBase))
 				}
 
 				ts.report.Bugs.BugStats = append(ts.report.Bugs.BugStats, stat)

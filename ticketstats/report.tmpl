@@ -132,7 +132,7 @@
                         <td>Fix Version</td>
                         <td>Security</td>
                         <td>Count</td>
-                        <td>Critical</td>
+                        <td>Bugs</td>
                     </tr>
                 </thead>
                 <tbody>
@@ -146,8 +146,11 @@
                         <td>
                             <table class="table">
                                 <tbody>
-                                    {{ range .Critical }}
+                                    {{ range .Bugs }}
                                     <tr>
+                                        <td>
+                                            <span class="tag is-info">{{ .Priority }}</span>
+                                        </td>
                                         <td>
                                             <span class="tag is-info">{{ .Status }}</span>
                                         </td>

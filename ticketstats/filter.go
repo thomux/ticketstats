@@ -187,10 +187,24 @@ func OrderByCreated(issues []*Issue) {
 	})
 }
 
-// OrderByCreated orders the issues by created date.
+// OrderByDue orders the issues by due date.
 func OrderByDue(issues []*Issue) {
 	sort.Slice(issues, func(i, j int) bool {
 		return issues[i].Due.Before(issues[j].Due)
+	})
+}
+
+// OrderByPriority orders the issues by priority.
+func OrderByPriority(issues []*Issue) {
+	sort.Slice(issues, func(i, j int) bool {
+		return strings.Compare(issues[i].Priority, issues[j].Priority) < 0
+	})
+}
+
+// OrderByStatus orders the issues by status.
+func OrderByStatus(issues []*Issue) {
+	sort.Slice(issues, func(i, j int) bool {
+		return strings.Compare(issues[i].Status, issues[j].Status) < 0
 	})
 }
 

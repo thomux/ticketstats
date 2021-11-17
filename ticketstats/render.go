@@ -190,6 +190,7 @@ type ReportIssue struct {
 	Key         string
 	Summary     string
 	Activity    string
+	Priority    string
 	HasDue      bool
 	Due         string
 	Created     string
@@ -221,6 +222,7 @@ func (issue *Issue) ToReportIssue(jiraBaseUrl string) ReportIssue {
 	rissue.Key = issue.Key
 	rissue.Summary = issue.Summary
 	rissue.Activity = issue.CustomActivity
+	rissue.Priority = issue.Priority
 	if issue.Due == noDate {
 		rissue.HasDue = false
 	} else {
@@ -355,14 +357,14 @@ type ReportBugStats struct {
 	Version  string
 	Security string
 	Count    int
-	Critical []ReportIssue
+	Bugs     []ReportIssue
 }
 
 // NewReportBugStats initializes a new ReportBugStats object.
 func NewReportBugStats() ReportBugStats {
 	var report ReportBugStats
 
-	report.Critical = make([]ReportIssue, 0)
+	report.Bugs = make([]ReportIssue, 0)
 
 	return report
 }

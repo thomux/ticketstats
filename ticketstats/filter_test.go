@@ -636,3 +636,11 @@ func TestFilter(t *testing.T) {
 func TestOrderByDue(t *testing.T) {
 	t.Fail()
 }
+
+func TestOrderByPriority(t *testing.T) {
+	t.Fail()
+}
+
+func TestOrderByStatus(t *testing.T) {
+	t.Fail()
+}
