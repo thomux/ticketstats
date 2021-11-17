@@ -38,6 +38,7 @@ func Evaluate(path string,
 	}
 
 	ClusterIssues(issues)
+	PrintClusters(issues, false)
 
 	ts := TicketStats{
 		config:   DefaultConfig(),

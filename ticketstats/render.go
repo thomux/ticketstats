@@ -227,6 +227,9 @@ func (issue *Issue) ToReportIssue(jiraBaseUrl string) ReportIssue {
 	} else {
 		rissue.HasDue = true
 		rissue.Due = issue.Due.Format("2006-01-02")
+		if issue.OriginalEstimate > 0.1 {
+			rissue.FTE = covertToFTE(issue.Due, issue.OriginalEstimate-issue.TimeSpend)
+		}
 	}
 	if issue.Created != noDate {
 		rissue.Created = issue.Created.Format("2006-01-02")
@@ -240,13 +243,12 @@ func (issue *Issue) ToReportIssue(jiraBaseUrl string) ReportIssue {
 	if issue.OriginalEstimate > 0.001 {
 		rissue.Estimate = formatWork(issue.OriginalEstimate)
 	}
-	if issue.TimeSpend > 0.001 {
+	if issue.TimeSpend > 0.1 {
 		rissue.TimeSpend = formatWork(issue.TimeSpend)
 	}
-	if issue.OriginalEstimate > 0.0 && issue.TimeSpend > 0.0 {
+	if issue.OriginalEstimate > 0.1 && issue.TimeSpend > 0.1 {
 		rissue.HasTime = true
 		rissue.Progress = int((issue.TimeSpend / issue.OriginalEstimate) * 100.0)
-		rissue.FTE = covertToFTE(issue.Due, issue.OriginalEstimate-issue.TimeSpend)
 		if issue.TimeSpend > issue.OriginalEstimate {
 			rissue.Overtime = true
 		}
