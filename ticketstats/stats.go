@@ -16,7 +16,7 @@ type Stats struct {
 }
 
 func (stats Stats) ToString() string {
-	return fmt.Sprintf("mean: %s, median: %s, overall: %s, count: %d",
+	return fmt.Sprintf("mean: %s, median: %s, count: %d",
 		formatWork(stats.Mean),
 		formatWork(stats.Median),
 		stats.Count)
@@ -33,25 +33,25 @@ func (tr TimeRanges) ToString() string {
 	str := ""
 
 	stats := tr.Week
-	str += fmt.Sprintf("last week:    mean: %.15s, median: %.15s, overall: %.2f FTE (%s, 32h/w), %d issues\n",
+	str += fmt.Sprintf("last week:    mean: %.15s, median: %.15s, %d issues\n",
 		formatWork(stats.Mean),
 		formatWork(stats.Median),
 		stats.Count)
 
 	stats = tr.Month
-	str += fmt.Sprintf("last month:   mean: %.15s, median: %.15s, overall: %.2f FTE (%s, 136h/m=4.25w), %d issues\n",
+	str += fmt.Sprintf("last month:   mean: %.15s, median: %.15s, %d issues\n",
 		formatWork(stats.Mean),
 		formatWork(stats.Median),
 		stats.Count)
 
 	stats = tr.Quarter
-	str += fmt.Sprintf("last quarter: mean: %.15s, median: %.15s, overall: %.2f FTE (%s), %d issues\n",
+	str += fmt.Sprintf("last quarter: mean: %.15s, median: %.15s, %d issues\n",
 		formatWork(stats.Mean),
 		formatWork(stats.Median),
 		stats.Count)
 
 	stats = tr.Year
-	str += fmt.Sprintf("last year:    mean: %.15s, median: %.15s, overall: %.2f FTE (%s), %d issues\n",
+	str += fmt.Sprintf("last year:    mean: %.15s, median: %.15s, %d issues\n",
 		formatWork(stats.Mean),
 		formatWork(stats.Median),
 		stats.Count)

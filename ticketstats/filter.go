@@ -99,6 +99,23 @@ func Labels(issues []*Issue) []string {
 	return result
 }
 
+func Components(issues []*Issue) []string {
+	result := make([]string, 0)
+	components := make(map[string]int)
+
+	for _, issue := range issues {
+		for _, component := range issue.Components {
+			_, ok := components[component]
+			if !ok {
+				components[component] = 1
+				result = append(result, component)
+			}
+		}
+	}
+
+	return result
+}
+
 func contains(slice []string, item string) bool {
 	set := make(map[string]struct{}, len(slice))
 	for _, s := range slice {

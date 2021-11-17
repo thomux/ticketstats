@@ -11,6 +11,7 @@ import (
 )
 
 type TicketStats struct {
+	config    Config
 	jiraBase  string
 	issues    []*Issue
 	active    []*Issue
@@ -39,6 +40,7 @@ func Evaluate(path string,
 	ClusterIssues(issues)
 
 	ts := TicketStats{
+		config:   DefaultConfig(),
 		jiraBase: jiraBase,
 		issues:   issues,
 		report:   NewReport(),
@@ -49,8 +51,20 @@ func Evaluate(path string,
 	ts.generateReport()
 
 	if splitByComponent {
-		log.Println("ERROR: split by component not implemented")
-		// TODO: generte reports for components
+		for _, component := range Components(issues) {
+			issues = FilterByComponent(issues, component)
+
+			ts = TicketStats{
+				config:   DefaultConfig(),
+				jiraBase: jiraBase,
+				issues:   issues,
+				report:   NewReport(),
+			}
+			ts.report.Component = component
+			ts.report.Date = time.Now().Format("2006-01-02")
+			ts.ignoreOld = true
+			ts.generateReport()
+		}
 	}
 }
 
