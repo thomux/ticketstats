@@ -15,8 +15,8 @@ func main() {
 	var split bool
 
 	flag.StringVar(&path, "csv", "JiraExport.csv", "path to Jira ticket export")
-	flag.StringVar(&project, "project", "ICAS1", "Jira project key")
-	flag.StringVar(&component, "component", "Linux", "Jira component name")
+	flag.StringVar(&project, "project", "", "Jira project key")
+	flag.StringVar(&component, "component", "", "Jira component name")
 	flag.StringVar(&jiraBase, "jira", "", "Jira base URL")
 	flag.BoolVar(&split, "splitByComponent", true, "split result by components")
 
