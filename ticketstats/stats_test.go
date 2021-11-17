@@ -64,3 +64,7 @@ func TestResultionTimesByType(t *testing.T) {
 func TestContainedTypes(t *testing.T) {
 	t.Fail()
 }
+
+func TestWorkAfter(t *testing.T) {
+	t.Fail()
+}

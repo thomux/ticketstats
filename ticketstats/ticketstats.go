@@ -65,6 +65,7 @@ func (ts *TicketStats) generateReport() {
 	ts.features()
 	ts.improvements()
 	ts.other()
+	ts.resources()
 
 	ts.report.Render()
 }
@@ -188,8 +189,6 @@ func (ts *TicketStats) improvements() {
 	openImprovements := OpenTickets(improvements)
 	OrderByDue(openImprovements)
 
-	PrintClusters(openImprovements, true)
-
 	for _, improvement := range openImprovements {
 		ri := improvement.ToReportIssue(ts.jiraBase)
 		if len(ri.Parents) == 0 {
@@ -229,4 +228,120 @@ func (ts *TicketStats) other() {
 
 		ts.report.Other.Month = append(ts.report.Other.Month, statMonth)
 	}
+}
+
+func (ts *TicketStats) resources() {
+	ranges := []string{"Last week", "Last month", "Last quarter", "Last year"}
+	hours := calcHours(ts.issues)
+	fte := calcFTE(hours)
+
+	for i, r := range ranges {
+		ts.report.Resources.Spend = append(ts.report.Resources.Spend, ResourceSpend{
+			TimeRange: r,
+			Effort:    formatWork(hours[i]),
+			FTE:       fmt.Sprintf("%.2f", fte[i]),
+		})
+	}
+
+	groups := make([]ResourceGroup, 4)
+	for _, g := range groups {
+		g.Type = "Type"
+	}
+	types := Types(ts.issues)
+	sort.Slice(types, func(i, j int) bool {
+		return strings.Compare(types[i], types[j]) < 0
+	})
+	for _, t := range types {
+		issuesByType := FilterByType(ts.issues, t)
+
+		ghours := calcHours(issuesByType)
+		gfte := calcFTE(ghours)
+
+		for i, g := range groups {
+			percent := int((ghours[i] / hours[i]) * 100.0)
+			if percent < 3 {
+				log.Println("DEBUG: Skip", t, "too less hours")
+				continue
+			}
+
+			g.Details = append(g.Details, ResourceDetails{
+				Type:    t,
+				Work:    formatWork(ghours[i]),
+				FTE:     fmt.Sprintf("%.2f", gfte[i]),
+				Percent: percent,
+			})
+			groups[i] = g
+		}
+	}
+	ts.report.Resources.Usage = append(ts.report.Resources.Usage, groups)
+
+	groups = make([]ResourceGroup, 4)
+	for _, g := range groups {
+		g.Type = "Label"
+	}
+	labels := Labels(ts.issues)
+	sort.Slice(labels, func(i, j int) bool {
+		return strings.Compare(labels[i], labels[j]) < 0
+	})
+	for _, l := range labels {
+		issuesByType := FilterByLabel(ts.issues, l)
+
+		ghours := calcHours(issuesByType)
+		gfte := calcFTE(ghours)
+
+		for i, g := range groups {
+			percent := int((ghours[i] / hours[i]) * 100.0)
+			if percent < 5 {
+				log.Println("DEBUG: Skip", l, "too less hours")
+				continue
+			}
+			g.Details = append(g.Details, ResourceDetails{
+				Type:    l,
+				Work:    formatWork(ghours[i]),
+				FTE:     fmt.Sprintf("%.2f", gfte[i]),
+				Percent: percent,
+			})
+			groups[i] = g
+		}
+	}
+	ts.report.Resources.Usage = append(ts.report.Resources.Usage, groups)
+
+	averageQuarter := NewResourceAverage()
+	averageQuarter.TimeRange = "Last quarter"
+	averageYear := NewResourceAverage()
+	averageYear.TimeRange = "Last year"
+	for issueType, times := range ResultionTimesByType(ClosedLastYear(ts.issues)) {
+		averageQuarter.Details = append(averageQuarter.Details, ResourceAverageDetails{
+			Type:   issueType,
+			Count:  times.Quarter.Count,
+			Median: formatWork(times.Quarter.Median),
+			Mean:   formatWork(times.Quarter.Mean),
+		})
+
+		averageYear.Details = append(averageYear.Details, ResourceAverageDetails{
+			Type:   issueType,
+			Count:  times.Year.Count,
+			Median: formatWork(times.Year.Median),
+			Mean:   formatWork(times.Year.Mean),
+		})
+	}
+	ts.report.Resources.Average = append(ts.report.Resources.Average, averageQuarter, averageYear)
+}
+
+func calcHours(issues []*Issue) []Work {
+	hours := make([]Work, 0)
+	hours = append(hours, WorkAfter(issues, time.Now().AddDate(0, 0, -7)))
+	hours = append(hours, WorkAfter(issues, time.Now().AddDate(0, -1, 0)))
+	hours = append(hours, WorkAfter(issues, time.Now().AddDate(0, -3, 0)))
+	hours = append(hours, WorkAfter(issues, time.Now().AddDate(-1, 0, 0)))
+	return hours
+}
+
+func calcFTE(hours []Work) []float64 {
+	fte := make([]float64, 0)
+	fte = append(fte, float64(hours[0]/40.0))
+	fte = append(fte, float64(hours[1]/(40.0*4.25)))
+	fte = append(fte, float64(hours[2]/(40.0*4.25*3)))
+	fte = append(fte, float64(hours[3]/(40.0*52)))
+	return fte
 }

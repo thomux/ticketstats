@@ -536,14 +536,12 @@
                                     <tbody>
                                         {{ range .Details }}
                                         <tr>
-                                            <td>{{ .Type }}</td>
+                                            <td style="max-width: 150px; overflow: hidden;">
+                                                <span title="{{ .Type }}">{{ .Type }}</span>
+                                            </td>
                                             <td>{{ .Work }}</td>
                                             <td>{{ .FTE }}</td>
-                                            <td>
-                                                <progress class="progress" value="{{ .Percent }}" max="100">
-                                                    {{ .Percent }}%
-                                                </progress>
-                                            </td>
+                                            <td>{{ .Percent }}%</td>
                                         </tr>
                                         {{ end }}
                                     </tbody>
@@ -574,7 +572,6 @@
                                             <td>Median effort</td>
                                             <td>Mean effort</td>
                                             <td>Count</td>
-                                            <td>FTE</td>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -584,7 +581,6 @@
                                             <td>{{ .Median }}</td>
                                             <td>{{ .Mean }}</td>
                                             <td>{{ .Count }}</td>
-                                            <td>{{ .FTE }}</td>
                                         </tr>
                                         {{ end }}
                                     </tbody>

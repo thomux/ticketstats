@@ -82,6 +82,23 @@ func Types(issues []*Issue) []string {
 	return result
 }
 
+func Labels(issues []*Issue) []string {
+	result := make([]string, 0)
+	labels := make(map[string]int)
+
+	for _, issue := range issues {
+		for _, label := range issue.Labels {
+			_, ok := labels[label]
+			if !ok {
+				labels[label] = 1
+				result = append(result, label)
+			}
+		}
+	}
+
+	return result
+}
+
 func contains(slice []string, item string) bool {
 	set := make(map[string]struct{}, len(slice))
 	for _, s := range slice {
@@ -185,6 +202,12 @@ func OlderThanOneMonth(issues []*Issue) []*Issue {
 func FilterByType(issues []*Issue, ticketType string) []*Issue {
 	return Filter(issues, func(issue *Issue) bool {
 		return issue.Type == ticketType
+	})
+}
+
+func FilterByLabel(issues []*Issue, label string) []*Issue {
+	return Filter(issues, func(issue *Issue) bool {
+		return contains(issue.Labels, label)
 	})
 }
 

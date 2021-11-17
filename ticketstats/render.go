@@ -174,7 +174,6 @@ type ResourceAverageDetails struct {
 	Median string
 	Mean   string
 	Count  int
-	FTE    string
 }
 
 // Link groups the data for web link.

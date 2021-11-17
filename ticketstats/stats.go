@@ -10,17 +10,15 @@ import (
 )
 
 type Stats struct {
-	Mean    Work
-	Median  Work
-	Overall Work
-	Count   int
+	Mean   Work
+	Median Work
+	Count  int
 }
 
 func (stats Stats) ToString() string {
 	return fmt.Sprintf("mean: %s, median: %s, overall: %s, count: %d",
 		formatWork(stats.Mean),
 		formatWork(stats.Median),
-		formatWork(stats.Overall),
 		stats.Count)
 }
 
@@ -38,32 +36,24 @@ func (tr TimeRanges) ToString() string {
 	str += fmt.Sprintf("last week:    mean: %.15s, median: %.15s, overall: %.2f FTE (%s, 32h/w), %d issues\n",
 		formatWork(stats.Mean),
 		formatWork(stats.Median),
-		stats.Overall/32,
-		formatWork(stats.Overall),
 		stats.Count)
 
 	stats = tr.Month
 	str += fmt.Sprintf("last month:   mean: %.15s, median: %.15s, overall: %.2f FTE (%s, 136h/m=4.25w), %d issues\n",
 		formatWork(stats.Mean),
 		formatWork(stats.Median),
-		stats.Overall/136,
-		formatWork(stats.Overall),
 		stats.Count)
 
 	stats = tr.Quarter
 	str += fmt.Sprintf("last quarter: mean: %.15s, median: %.15s, overall: %.2f FTE (%s), %d issues\n",
 		formatWork(stats.Mean),
 		formatWork(stats.Median),
-		stats.Overall/408,
-		formatWork(stats.Overall),
 		stats.Count)
 
 	stats = tr.Year
 	str += fmt.Sprintf("last year:    mean: %.15s, median: %.15s, overall: %.2f FTE (%s), %d issues\n",
 		formatWork(stats.Mean),
 		formatWork(stats.Median),
-		stats.Overall/1632,
-		formatWork(stats.Overall),
 		stats.Count)
 
 	return str
@@ -86,7 +76,9 @@ func ResolutionTime(issues []*Issue, startDate time.Time) Stats {
 	times := make([]float64, 0)
 
 	for _, issue := range issues {
-		times = append(times, float64(issue.TimeSpend))
+		if issue.TimeSpend > 0.0 {
+			times = append(times, float64(issue.TimeSpend))
+		}
 	}
 
 	mean, err := stats.Mean(times)
@@ -99,20 +91,10 @@ func ResolutionTime(issues []*Issue, startDate time.Time) Stats {
 		log.Println("ERROR: median of resolution time", err)
 	}
 
-	overall := Work(0.0)
-	for _, issue := range issues {
-		for _, l := range issue.LogWorks {
-			if l.Date.After(startDate) {
-				overall += l.Hours
-			}
-		}
-	}
-
 	return Stats{
-		Mean:    Work(mean),
-		Median:  Work(median),
-		Overall: overall,
-		Count:   len(issues),
+		Mean:   Work(mean),
+		Median: Work(median),
+		Count:  len(times),
 	}
 }
 
@@ -160,4 +142,16 @@ func containedTypes(issues []*Issue) []string {
 	}
 
 	return types
+}
+
+func WorkAfter(issues []*Issue, start time.Time) Work {
+	var work Work
+	for _, issue := range issues {
+		for _, log := range issue.LogWorks {
+			if log.Date.After(start) {
+				work += log.Hours
+			}
+		}
+	}
+	return work
 }
