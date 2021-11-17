@@ -103,6 +103,7 @@ type Issue struct {
 	CustomActivity       string
 	CustomCategory       string
 	Childs               []*Issue
+	Parents              []*Issue
 }
 
 // NewIssue creates a new issue.
@@ -128,6 +129,7 @@ func NewIssue() *Issue {
 	issue.LinkLinkIssues = make([]string, 0)
 	issue.LinkParents = make([]string, 0)
 	issue.Childs = make([]*Issue, 0)
+	issue.Parents = make([]*Issue, 0)
 
 	return issue
 }

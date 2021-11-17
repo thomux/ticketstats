@@ -7,6 +7,11 @@
     <title>{{ .Component }} - Jira Ticket Stats</title>
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.3/css/bulma.min.css">
+    <style>
+        progress {
+            min-width: 100px;
+        }
+    </style>
 </head>
 <body>
     <section class="section">
@@ -140,13 +145,6 @@
                         <td>{{ .Count }}</td>
                         <td>
                             <table class="table">
-                                <thead>
-                                    <tr>
-                                        <td>Status</td>
-                                        <td>Created</td>
-                                        <td>Issue</td>
-                                    </tr>
-                                </thead>
                                 <tbody>
                                     {{ range .Critical }}
                                     <tr>
@@ -202,12 +200,12 @@
                                         <span class="tag is-warning">No Due</span>
                                     {{ end }}
                                 </td>
-                                <td>{{ .TimeSpend }}</td>
-                                <td>/</td>
-                                <td>{{ .Estimate }}</td>
+                                <td>{{ .TimeSpend }}{{ if .HasTime }} / {{ end }}{{ .Estimate }}</td>
                                 <td>
                                     {{ if .HasTime }}
+                                        {{ if not .Overtime }}
                                         <progress class="progress" value="{{ .Progress }}" max="100">{{ .Progress }}%</progress>
+                                        {{ end }}
                                     {{ end }}
                                 </td>
                                 <td>
@@ -253,12 +251,12 @@
                                             <span class="tag is-warning">No Due</span>
                                         {{ end }}
                                     </td>
-                                    <td>{{ .TimeSpend }}</td>
-                                    <td>/</td>
-                                    <td>{{ .Estimate }}</td>
+                                    <td>{{ .TimeSpend }}{{ if .HasTime }} / {{ end }}{{ .Estimate }}</td>
                                     <td>
                                         {{ if .HasTime }}
+                                            {{ if not .Overtime }}
                                             <progress class="progress" value="{{ .Progress }}" max="100">{{ .Progress }}%</progress>
+                                            {{ end }}
                                         {{ end }}
                                     </td>
                                     <td>
@@ -300,16 +298,6 @@
                         </a>
                     </p>
                     <table class="table">
-                        <thead>
-                            <tr>
-                                <td>Status</td>
-                                <td>Fix Version</td>
-                                <td>Estimate</td>
-                                <td>Time spend</td>
-                                <td></td>
-                                <td></td>
-                            </tr>
-                        </thead>
                         <tbody>
                             <tr>
                                 <td>
@@ -320,11 +308,19 @@
                                     <span class="tag is-light">{{ . }}</span>
                                     {{ end }}
                                 </td>
-                                <td>{{ .Estimate }}</td>
-                                <td>{{ .TimeSpend }}</td>
+                                <td>
+                                    {{ if .HasDue }}
+                                        {{ .Due }}
+                                    {{ else }}
+                                        <span class="tag is-warning">No Due</span>
+                                    {{ end }}
+                                </td>
+                                <td>{{ .TimeSpend }}{{ if .HasTime }} / {{ end }}{{ .Estimate }}</td>
                                 <td>
                                     {{ if .HasTime }}
+                                        {{ if not .Overtime }}
                                         <progress class="progress" value="{{ .Progress }}" max="100">{{ .Progress }}%</progress>
+                                        {{ end }}
                                     {{ end }}
                                 </td>
                                 <td>
@@ -347,20 +343,7 @@
                 {{ if .HasChilds }}
                 <div class="card-content">
                     <div class="content">
-                        <h2>Related tickets:</h2>
                         <table class="table">
-                            <thead>
-                                <tr>
-                                    <td>Issue</td>
-                                    <td>Status</td>
-                                    <td>Part of</td>
-                                    <td>Fix Version</td>
-                                    <td>Estimate</td>
-                                    <td>Time spend</td>
-                                    <td></td>
-                                    <td></td>
-                                </tr>
-                            </thead>
                             <tbody>
                                 {{ range .Childs }}
                                 <tr>
@@ -372,20 +355,23 @@
                                         <span class="tag is-info">{{ .Status }}</span>
                                     </td>
                                     <td>
-                                        {{ range .Parents }}
-                                            <a href="{{ .Url }}">{{ .Name }}</a>
-                                        {{ end }}
-                                    </td>
-                                    <td>
                                         {{ range .FixVersions }}
                                         <span class="tag is-light">{{ . }}</span>
                                         {{ end }}
                                     </td>
-                                    <td>{{ .Estimate }}</td>
-                                    <td>{{ .TimeSpend }}</td>
+                                    <td>
+                                        {{ if .HasDue }}
+                                            {{ .Due }}
+                                        {{ else }}
+                                            <span class="tag is-warning">No Due</span>
+                                        {{ end }}
+                                    </td>
+                                    <td>{{ .TimeSpend }}{{ if .HasTime }} / {{ end }}{{ .Estimate }}</td>
                                     <td>
                                         {{ if .HasTime }}
+                                            {{ if not .Overtime }}
                                             <progress class="progress" value="{{ .Progress }}" max="100">{{ .Progress }}%</progress>
+                                            {{ end }}
                                         {{ end }}
                                     </td>
                                     <td>
