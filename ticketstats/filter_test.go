@@ -644,3 +644,7 @@ func TestOrderByPriority(t *testing.T) {
 func TestOrderByStatus(t *testing.T) {
 	t.Fail()
 }
+
+func TestTypes(t *testing.T) {
+	t.Fail()
+}

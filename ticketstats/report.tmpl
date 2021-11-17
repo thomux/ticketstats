@@ -42,7 +42,7 @@
                         <a href="{{ .JiraUrl }}">{{ .Key }}</a>
                         {{ .Summary }}
                     </td>
-                    <td>{{ .Age }} days</td>
+                    <td style="min-width: 100px;">{{ .Age }} days</td>
                     <td>
                         {{ range .Labels }}
                         <span class="tag">
@@ -51,7 +51,7 @@
                         {{ end }}
                     </td>
                     <td>
-                        <span class="tag is-info">{{ .Status }}</span>
+                        <span class="tag is-info" style="min-width: 110px;">{{ .Status }}</span>
                     </td>
                     <td>{{ .Creator }}</td>
                     <td>{{ .Assignee }}</td>
@@ -62,344 +62,362 @@
     </section>
     <!-- End of template for old bug tickets -->
 
-        <!-- Start of template for bug report -->
-        <section class="section">
-            {{with .Bugs}}
-            <h1 class="title">Bug tickets</h1>
-            <h1 class="subtitle">{{ .Count }} bug tickets</h1>
-    
-            <table class="table">
-                <thead>
-                    <tr>
-                        <td></td>
-                        <td>Created</td>
-                        <td>Resolved</td>
-                        <td>Diff</td>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>
-                            Last week
-                        </td>
-                        {{ with .Week }}
-                        <td>{{ .Created }}</td>
-                        <td>{{ .Resolved }}</td>
-                        <td>{{ .Diff }}</td>
-                        {{ end }}
-                    </tr>
-                    <tr>
-                        <td>
-                            Last month
-                        </td>
-                        {{ with .Month }}
-                        <td>{{ .Created }}</td>
-                        <td>{{ .Resolved }}</td>
-                        <td>{{ .Diff }}</td>
-                        {{ end }}
-                    </tr>
-                </tbody>
-            </table>
-            
-            {{ with .BugCounts }}
-            <div class="block">
+    <!-- Start of template for bug report -->
+    <section class="section">
+        {{with .Bugs}}
+        <h1 class="title">Bug tickets</h1>
+        <h1 class="subtitle">{{ .Count }} bug tickets</h1>
+
+        <div class="columns">
+            <div class="column">
                 <table class="table">
                     <thead>
                         <tr>
-                            <td>Security Level</td>
-                            {{ range .Versions }}
-                                <td>{{ . }}</td>
-                            {{ end }}
-                            <td>Sum</td>
+                            <td></td>
+                            <td>Created</td>
+                            <td>Resolved</td>
+                            <td>Diff</td>
                         </tr>
                     </thead>
                     <tbody>
-                        {{ range .Values }}
                         <tr>
-                            {{ range . }}
-                            <td>{{ . }}</td>
+                            <td>
+                                Last week
+                            </td>
+                            {{ with .Week }}
+                            <td>{{ .Created }}</td>
+                            <td>{{ .Resolved }}</td>
+                            <td>{{ .Diff }}</td>
                             {{ end }}
                         </tr>
-                        {{ end }}
+                        <tr>
+                            <td>
+                                Last month
+                            </td>
+                            {{ with .Month }}
+                            <td>{{ .Created }}</td>
+                            <td>{{ .Resolved }}</td>
+                            <td>{{ .Diff }}</td>
+                            {{ end }}
+                        </tr>
                     </tbody>
                 </table>
             </div>
-            {{ end }}
-
-            <table class="table">
-                <thead>
-                    <tr>
-                        <td>Fix Version</td>
-                        <td>Security</td>
-                        <td>Count</td>
-                        <td>Bugs</td>
-                    </tr>
-                </thead>
-                <tbody>
-                    {{ range .BugStats }}
-                    <tr>
-                        <td>
-                            {{ .Version }}
-                        </td>
-                        <td>{{ .Security }}</td>
-                        <td>{{ .Count }}</td>
-                        <td>
-                            <table class="table">
-                                <tbody>
-                                    {{ range .Bugs }}
-                                    <tr>
-                                        <td>
-                                            <span class="tag is-info">{{ .Priority }}</span>
-                                        </td>
-                                        <td>
-                                            <span class="tag is-info">{{ .Status }}</span>
-                                        </td>
-                                        <td>{{ .Created }}</td>
-                                        <td>
-                                            <a href="{{ .JiraUrl }}">{{ .Key }}</a>
-                                            {{ .Summary }}
-                                        </td>                                        
-                                    </tr>
-                                    {{ end }}
-                                </tbody>
-                            </table>
-                        </td>
-                    </tr>
-                    {{ end }}
-                </tbody>
-            </table>
-            {{ end }}
-        </section>
-        <!-- End of template for bug report -->
-
-            <!-- Start of template for feature report -->
-    <section class="section">
-        <h1 class="title">Features</h1>
-
-        {{ range .Features }}
-        <div class="block">
-            <div class="card">
-                <header class="card-header">
-                    <p class="card-header-title">
-                        <a href="{{ .JiraUrl }}">
-                            {{ .Key }} {{ .Summary }}
-                        </a>
-                    </p>
+            <div class="column">
+                {{ with .BugCounts }}
+                <div class="block">
                     <table class="table">
-                        <tbody>
+                        <thead>
                             <tr>
-                                <td>
-                                    <span class="tag is-info">{{ .Status }}</span>
-                                </td>
-                                <td>
-                                    {{ range .FixVersions }}
-                                    <span class="tag is-light">{{ . }}</span>
-                                    {{ end }}
-                                </td>
-                                <td>
-                                    {{ if .HasDue }}
-                                        {{ .Due }}
-                                    {{ else }}
-                                        <span class="tag is-warning">No Due</span>
-                                    {{ end }}
-                                </td>
-                                <td>{{ .TimeSpend }}{{ if .HasTime }} / {{ end }}{{ .Estimate }}</td>
-                                <td>
-                                    {{ if .HasTime }}
-                                        {{ if not .Overtime }}
-                                        <progress class="progress" value="{{ .Progress }}" max="100">{{ .Progress }}%</progress>
-                                        {{ end }}
-                                    {{ end }}
-                                </td>
-                                <td>
-                                    {{ if and .HasDue .HasTime }}
-                                        {{ if .Overtime }}
-                                            <span class="tag is-danger">
-                                                High Effort
-                                            </span>
-                                        {{ else }}
-                                            <span class="tag {{ if .AtRisk }}is-danger{{ else }}is-success{{ end }}">
-                                                {{ .FTE }} FTE
-                                            </span>
-                                        {{ end }}
-                                    {{ end }}
-                                </td>
+                                <td>Security Level</td>
+                                {{ range .Versions }}
+                                    <td>{{ . }}</td>
+                                {{ end }}
+                                <td>Sum</td>
                             </tr>
+                        </thead>
+                        <tbody>
+                            {{ range .Values }}
+                            <tr>
+                                {{ range . }}
+                                <td>{{ . }}</td>
+                                {{ end }}
+                            </tr>
+                            {{ end }}
                         </tbody>
                     </table>
-                </header>
-                {{ if .HasChilds }}
-                <div class="card-content">
-                    <div class="content">
-                        <table class="table">
-                            <tbody>
-                                {{ range .Childs }}
-                                <tr>
-                                    <td>
-                                        <a href="{{ .JiraUrl }}">{{ .Key }}</a>
-                                        {{ .Summary }}
-                                    </td>
-                                    <td>
-                                        <span class="tag is-info">{{ .Status }}</span>
-                                    </td>
-                                    <td>
-                                        {{ range .FixVersions }}
-                                        <span class="tag is-light">{{ . }}</span>
-                                        {{ end }}
-                                    </td>
-                                    <td>
-                                        {{ if .HasDue }}
-                                            {{ .Due }}
-                                        {{ else }}
-                                            <span class="tag is-warning">No Due</span>
-                                        {{ end }}
-                                    </td>
-                                    <td>{{ .TimeSpend }}{{ if .HasTime }} / {{ end }}{{ .Estimate }}</td>
-                                    <td>
-                                        {{ if .HasTime }}
-                                            {{ if not .Overtime }}
-                                            <progress class="progress" value="{{ .Progress }}" max="100">{{ .Progress }}%</progress>
-                                            {{ end }}
-                                        {{ end }}
-                                    </td>
-                                    <td>
-                                        {{ if and .HasDue .HasTime }}
-                                            {{ if .Overtime }}
-                                                <span class="tag is-danger">
-                                                    High Effort
-                                                </span>
-                                            {{ else }}
-                                                <span class="tag {{ if .AtRisk }}is-danger{{ else }}is-success{{ end }}">
-                                                    {{ .FTE }} FTE
-                                                </span>
-                                            {{ end }}
-                                        {{ end }}
-                                    </td>
-                                </tr>
-                                {{ end }}
-                            </tbody>
-                        </table>
-                    </div>
                 </div>
                 {{ end }}
             </div>
         </div>
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <td>Fix Version</td>
+                    <td>Security</td>
+                    <td>Count</td>
+                    <td>Bugs</td>
+                </tr>
+            </thead>
+            <tbody>
+                {{ range .BugStats }}
+                <tr>
+                    <td>
+                        {{ .Version }}
+                    </td>
+                    <td>{{ .Security }}</td>
+                    <td>{{ .Count }}</td>
+                    <td>
+                        <table class="table">
+                            <tbody>
+                                {{ range .Bugs }}
+                                <tr>
+                                    <td>
+                                        <span class="tag is-info" style="min-width: 60px;">{{ .Priority }}</span>
+                                    </td>
+                                    <td>
+                                        <span class="tag is-info" style="min-width: 110px;">{{ .Status }}</span>
+                                    </td>
+                                    <td style="min-width: 120px;">{{ .Created }}</td>
+                                    <td>
+                                        <a href="{{ .JiraUrl }}">{{ .Key }}</a>
+                                        {{ .Summary }}
+                                    </td>                                        
+                                </tr>
+                                {{ end }}
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+                {{ end }}
+            </tbody>
+        </table>
         {{ end }}
+    </section>
+    <!-- End of template for bug report -->
+
+    <!-- Start of template for feature report -->
+    <section class="section">
+        <h1 class="title">Features</h1>
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <td colspan="2">Key</td>
+                    <td>Summary</td>
+                    <td>Status</td>
+                    <td>Fix Versions</td>
+                    <td>Due</td>
+                    <td>Time Spend</td>
+                    <td>Estimate</td>
+                    <td>Progress</td>
+                    <td>FTE</td>
+                </tr>
+            </thead>
+            <tbody>
+                {{ range .Features }}
+                {{ $bg := second }}
+                <tr {{ if $bg }}style="background: lightgrey"{{ end }}>
+                    <td colspan="2">
+                        <a href="{{ .JiraUrl }}">{{ .Key }}</a>
+                    </td>
+                    <td>
+                        {{ .Summary }}
+                    </td>
+                    <td>
+                        <span class="tag is-info" style="min-width: 135px;">{{ .Status }}</span>
+                    </td>
+                    <td>
+                        {{ range .FixVersions }}
+                        <span class="tag is-light">{{ . }}</span>
+                        {{ end }}
+                    </td>
+                    <td>
+                        {{ if .HasDue }}
+                            {{ .Due }}
+                        {{ else }}
+                            <span class="tag is-warning">No Due</span>
+                        {{ end }}
+                    </td>
+                    <td>{{ .TimeSpend }}</td>
+                    <td>{{ .Estimate }}</td>
+                    <td>
+                        {{ if .HasTime }}
+                            {{ if not .Overtime }}
+                            <progress class="progress" value="{{ .Progress }}" max="100">{{ .Progress }}%</progress>
+                            {{ end }}
+                        {{ end }}
+                    </td>
+                    <td>
+                        {{ if and .HasDue .HasTime }}
+                            {{ if .Overtime }}
+                                <span class="tag is-danger">
+                                    High Effort
+                                </span>
+                            {{ else }}
+                                <span class="tag {{ if .AtRisk }}is-danger{{ else }}is-success{{ end }}">
+                                    {{ .FTE }} FTE
+                                </span>
+                            {{ end }}
+                        {{ end }}
+                    </td>
+                </tr>
+                {{ if .HasChilds }}
+                {{ range .Childs }}
+                <tr {{ if $bg }}style="background: lightgrey"{{ end }}>
+                    <td>- </td>
+                    <td>
+                        <a href="{{ .JiraUrl }}">{{ .Key }}</a>
+                    </td>
+                    <td>
+                        {{ .Summary }}
+                    </td>
+                    <td>
+                        <span class="tag is-info" style="min-width: 135px;">{{ .Status }}</span>
+                    </td>
+                    <td>
+                        {{ range .FixVersions }}
+                        <span class="tag is-light">{{ . }}</span>
+                        {{ end }}
+                    </td>
+                    <td>
+                        {{ if .HasDue }}
+                            {{ .Due }}
+                        {{ else }}
+                            <span class="tag is-warning">No Due</span>
+                        {{ end }}
+                    </td>
+                    <td>{{ .TimeSpend }}</td>
+                    <td>{{ .Estimate }}</td>
+                    <td>
+                        {{ if .HasTime }}
+                            {{ if not .Overtime }}
+                            <progress class="progress" value="{{ .Progress }}" max="100">{{ .Progress }}%</progress>
+                            {{ end }}
+                        {{ end }}
+                    </td>
+                    <td>
+                        {{ if and .HasDue .HasTime }}
+                            {{ if .Overtime }}
+                                <span class="tag is-danger">
+                                    High Effort
+                                </span>
+                            {{ else }}
+                                <span class="tag {{ if .AtRisk }}is-danger{{ else }}is-success{{ end }}">
+                                    {{ .FTE }} FTE
+                                </span>
+                            {{ end }}
+                        {{ end }}
+                    </td>
+                </tr>
+                {{ end }}
+                {{ end }}
+                {{ end }}
+            </tbody>
+        </table>
+        
     </section>
     <!-- End of template for feature report -->
 
     <section class="section">
         <h1 class="title">Improvements</h1>
 
-        {{ range .Improvements }}
-        <div class="block">
-            <div class="card">
-                <header class="card-header">
-                    <p class="card-header-title">
-                        <a href="{{ .JiraUrl }}">
-                            {{ .Key }} {{ .Summary }}
-                        </a>
-                    </p>
-                    <table class="table">
-                        <tbody>
-                            <tr>
-                                <td>
-                                    <span class="tag is-info">{{ .Status }}</span>
-                                </td>
-                                <td>
-                                    {{ range .FixVersions }}
-                                    <span class="tag is-light">{{ . }}</span>
-                                    {{ end }}
-                                </td>
-                                <td>
-                                    {{ if .HasDue }}
-                                        {{ .Due }}
-                                    {{ else }}
-                                        <span class="tag is-warning">No Due</span>
-                                    {{ end }}
-                                </td>
-                                <td>{{ .TimeSpend }}{{ if .HasTime }} / {{ end }}{{ .Estimate }}</td>
-                                <td>
-                                    {{ if .HasTime }}
-                                        {{ if not .Overtime }}
-                                        <progress class="progress" value="{{ .Progress }}" max="100">{{ .Progress }}%</progress>
-                                        {{ end }}
-                                    {{ end }}
-                                </td>
-                                <td>
-                                    {{ if and .HasDue .HasTime }}
-                                        {{ if .Overtime }}
-                                            <span class="tag is-danger">
-                                                High Effort
-                                            </span>
-                                        {{ else }}
-                                            <span class="tag {{ if .AtRisk }}is-danger{{ else }}is-success{{ end }}">
-                                                {{ .FTE }} FTE
-                                            </span>
-                                        {{ end }}
-                                    {{ end }}
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </header>
+                <table class="table">
+            <thead>
+                <tr>
+                    <td colspan="2">Key</td>
+                    <td>Summary</td>
+                    <td>Status</td>
+                    <td>Fix Versions</td>
+                    <td>Due</td>
+                    <td>Time Spend</td>
+                    <td>Estimate</td>
+                    <td>Progress</td>
+                    <td>FTE</td>
+                </tr>
+            </thead>
+            <tbody>
+                {{ range .Improvements }}
+                {{ $bg := second }}
+                <tr {{ if $bg }}style="background: lightgrey"{{ end }}>
+                    <td colspan="2">
+                        <a href="{{ .JiraUrl }}">{{ .Key }}</a>
+                    </td>
+                    <td>
+                        {{ .Summary }}
+                    </td>
+                    <td>
+                        <span class="tag is-info" style="min-width: 135px;">{{ .Status }}</span>
+                    </td>
+                    <td>
+                        {{ range .FixVersions }}
+                        <span class="tag is-light">{{ . }}</span>
+                        {{ end }}
+                    </td>
+                    <td>
+                        {{ if .HasDue }}
+                            {{ .Due }}
+                        {{ else }}
+                            <span class="tag is-warning">No Due</span>
+                        {{ end }}
+                    </td>
+                    <td>{{ .TimeSpend }}</td>
+                    <td>{{ .Estimate }}</td>
+                    <td>
+                        {{ if .HasTime }}
+                            {{ if not .Overtime }}
+                            <progress class="progress" value="{{ .Progress }}" max="100">{{ .Progress }}%</progress>
+                            {{ end }}
+                        {{ end }}
+                    </td>
+                    <td>
+                        {{ if and .HasDue .HasTime }}
+                            {{ if .Overtime }}
+                                <span class="tag is-danger">
+                                    High Effort
+                                </span>
+                            {{ else }}
+                                <span class="tag {{ if .AtRisk }}is-danger{{ else }}is-success{{ end }}">
+                                    {{ .FTE }} FTE
+                                </span>
+                            {{ end }}
+                        {{ end }}
+                    </td>
+                </tr>
                 {{ if .HasChilds }}
-                <div class="card-content">
-                    <div class="content">
-                        <table class="table">
-                            <tbody>
-                                {{ range .Childs }}
-                                <tr>
-                                    <td>
-                                        <a href="{{ .JiraUrl }}">{{ .Key }}</a>
-                                        {{ .Summary }}
-                                    </td>
-                                    <td>
-                                        <span class="tag is-info">{{ .Status }}</span>
-                                    </td>
-                                    <td>
-                                        {{ range .FixVersions }}
-                                        <span class="tag is-light">{{ . }}</span>
-                                        {{ end }}
-                                    </td>
-                                    <td>
-                                        {{ if .HasDue }}
-                                            {{ .Due }}
-                                        {{ else }}
-                                            <span class="tag is-warning">No Due</span>
-                                        {{ end }}
-                                    </td>
-                                    <td>{{ .TimeSpend }}{{ if .HasTime }} / {{ end }}{{ .Estimate }}</td>
-                                    <td>
-                                        {{ if .HasTime }}
-                                            {{ if not .Overtime }}
-                                            <progress class="progress" value="{{ .Progress }}" max="100">{{ .Progress }}%</progress>
-                                            {{ end }}
-                                        {{ end }}
-                                    </td>
-                                    <td>
-                                        {{ if and .HasDue .HasTime }}
-                                            {{ if .Overtime }}
-                                                <span class="tag is-danger">
-                                                    High Effort
-                                                </span>
-                                            {{ else }}
-                                                <span class="tag {{ if .AtRisk }}is-danger{{ else }}is-success{{ end }}">
-                                                    {{ .FTE }} FTE
-                                                </span>
-                                            {{ end }}
-                                        {{ end }}
-                                    </td>
-                                </tr>
-                                {{ end }}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+                {{ range .Childs }}
+                <tr {{ if $bg }}style="background: lightgrey"{{ end }}>
+                    <td>- </td>
+                    <td>
+                        <a href="{{ .JiraUrl }}">{{ .Key }}</a>
+                    </td>
+                    <td>
+                        {{ .Summary }}
+                    </td>
+                    <td>
+                        <span class="tag is-info" style="min-width: 135px;">{{ .Status }}</span>
+                    </td>
+                    <td>
+                        {{ range .FixVersions }}
+                        <span class="tag is-light">{{ . }}</span>
+                        {{ end }}
+                    </td>
+                    <td>
+                        {{ if .HasDue }}
+                            {{ .Due }}
+                        {{ else }}
+                            <span class="tag is-warning">No Due</span>
+                        {{ end }}
+                    </td>
+                    <td>{{ .TimeSpend }}</td>
+                    <td>{{ .Estimate }}</td>
+                    <td>
+                        {{ if .HasTime }}
+                            {{ if not .Overtime }}
+                            <progress class="progress" value="{{ .Progress }}" max="100">{{ .Progress }}%</progress>
+                            {{ end }}
+                        {{ end }}
+                    </td>
+                    <td>
+                        {{ if and .HasDue .HasTime }}
+                            {{ if .Overtime }}
+                                <span class="tag is-danger">
+                                    High Effort
+                                </span>
+                            {{ else }}
+                                <span class="tag {{ if .AtRisk }}is-danger{{ else }}is-success{{ end }}">
+                                    {{ .FTE }} FTE
+                                </span>
+                            {{ end }}
+                        {{ end }}
+                    </td>
+                </tr>
                 {{ end }}
-            </div>
-        </div>
-        {{ end }}
+                {{ end }}
+                {{ end }}
+            </tbody>
+        </table>
     </section>
 
     {{ with .Other }}

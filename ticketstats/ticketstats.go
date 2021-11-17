@@ -64,6 +64,7 @@ func (ts *TicketStats) generateReport() {
 	ts.bugs()
 	ts.features()
 	ts.improvements()
+	ts.other()
 
 	ts.report.Render()
 }
@@ -187,10 +188,45 @@ func (ts *TicketStats) improvements() {
 	openImprovements := OpenTickets(improvements)
 	OrderByDue(openImprovements)
 
+	PrintClusters(openImprovements, true)
+
 	for _, improvement := range openImprovements {
 		ri := improvement.ToReportIssue(ts.jiraBase)
 		if len(ri.Parents) == 0 {
 			ts.report.Improvements = append(ts.report.Improvements, ri)
 		}
+	}
+}
+
+func (ts *TicketStats) other() {
+	others := Filter(ts.issues, func(issue *Issue) bool {
+		return !(issue.Type == "Bug" || issue.Type == "New Feature" || issue.Type == "Improvement")
+	})
+
+	ts.report.Other.Count = len(OpenTickets(others))
+
+	for _, t := range Types(others) {
+		issues := FilterByType(others, t)
+		count := len(OpenTickets(issues))
+
+		statWeek := OtherTypeStats{
+			Count: count,
+			Type:  t,
+		}
+		statWeek.Report.Created = len(CreatedLastWeek(issues))
+		statWeek.Report.Resolved = len(ClosedLastWeek(issues))
+		statWeek.Report.Diff = statWeek.Report.Created - statWeek.Report.Resolved
+
+		ts.report.Other.Week = append(ts.report.Other.Week, statWeek)
+
+		statMonth := OtherTypeStats{
+			Count: count,
+			Type:  t,
+		}
+		statMonth.Report.Created = len(CreatedLastMonth(issues))
+		statMonth.Report.Resolved = len(ClosedLastMonth(issues))
+		statMonth.Report.Diff = statWeek.Report.Created - statWeek.Report.Resolved
+
+		ts.report.Other.Month = append(ts.report.Other.Month, statMonth)
 	}
 }

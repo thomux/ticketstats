@@ -404,7 +404,13 @@ func (report Report) Render() {
 	}
 	w := bufio.NewWriter(f)
 
-	t, err := template.New("report").Parse(reportTemplate)
+	t := template.New("report")
+	sec := false
+	t.Funcs(template.FuncMap{"second": func() bool {
+		sec = !sec
+		return sec
+	}})
+	t, err = t.Parse(reportTemplate)
 	if err != nil {
 		panic(err)
 	}

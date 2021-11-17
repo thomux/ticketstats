@@ -74,7 +74,7 @@ func ClusterIssues(issues []*Issue) {
 			if !ok {
 				continue
 			}
-			issue.Childs = append(issue.Childs, part)
+			part.Childs = append(issue.Childs, issue)
 			log.Println("DEBUG: cluster by parts", issue.Key, "->", part.Key)
 		}
 

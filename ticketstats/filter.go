@@ -67,6 +67,21 @@ func SecurityLevels(issues []*Issue) []string {
 	return result
 }
 
+func Types(issues []*Issue) []string {
+	result := make([]string, 0)
+	types := make(map[string]int)
+
+	for _, issue := range issues {
+		_, ok := types[issue.Type]
+		if !ok {
+			types[issue.Type] = 1
+			result = append(result, issue.Type)
+		}
+	}
+
+	return result
+}
+
 func contains(slice []string, item string) bool {
 	set := make(map[string]struct{}, len(slice))
 	for _, s := range slice {

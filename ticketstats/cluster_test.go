@@ -91,12 +91,12 @@ func TestClusterIssuesParts(t *testing.T) {
 
 	ClusterIssues(issues)
 
-	if len(issues[0].Childs) != 1 {
+	if len(issues[1].Childs) != 1 {
 		log.Println("TEST: parent issue")
 		t.Fail()
 	}
 
-	if len(issues[1].Childs) != 0 {
+	if len(issues[0].Childs) != 0 {
 		log.Println("TEST: child issue")
 		t.Fail()
 	}
