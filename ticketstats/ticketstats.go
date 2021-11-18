@@ -97,7 +97,7 @@ func (ts *TicketStats) sanitize() {
 }
 
 func (ts *TicketStats) oldBugs() {
-	oldBugs := OldBugs(ts.active)
+	oldBugs := OldBugs(ts.active, ts.config)
 
 	filterStates := []string{"Verification", "Acceptace", "Integration"}
 

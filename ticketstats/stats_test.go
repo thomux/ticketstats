@@ -40,7 +40,7 @@ func TestOldBugs(t *testing.T) {
 	issue.Created = time.Now().AddDate(0, -1, -5)
 	issues = append(issues, issue)
 
-	old := OldBugs(issues)
+	old := OldBugs(issues, DefaultConfig())
 
 	if len(old) != 1 {
 		log.Println("TEST: wrong count of old bugs")
