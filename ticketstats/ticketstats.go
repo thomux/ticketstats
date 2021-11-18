@@ -60,7 +60,7 @@ func Evaluate(path string,
 			ts = TicketStats{
 				config:   DefaultConfig(),
 				jiraBase: jiraBase,
-				issues:   issues,
+				issues:   FilterByComponent(issues, component),
 				report:   NewReport(),
 			}
 			ts.report.Component = component
