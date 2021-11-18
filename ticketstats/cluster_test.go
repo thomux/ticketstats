@@ -291,5 +291,64 @@ func TestLinkParentsRecursive(t *testing.T) {
 }
 
 func TestRemoveDuplicateChildsRecursive(t *testing.T) {
-	t.Fail()
+	issueA := NewIssue()
+	issueA.Key = "A"
+
+	issueB := NewIssue()
+	issueB.Key = "B"
+
+	issueC := NewIssue()
+	issueC.Key = "C"
+	issueC.Childs = append(issueC.Childs, issueA, issueB, issueB, issueB)
+
+	issueD := NewIssue()
+	issueD.Key = "D"
+
+	issueE := NewIssue()
+	issueE.Key = "E"
+	issueE.Childs = append(issueE.Childs, issueC, issueC)
+
+	issueF := NewIssue()
+	issueF.Key = "F"
+	issueF.Childs = append(issueF.Childs, issueD, issueE, issueE, issueA)
+
+	removeDuplicateChildsRecursive(issueF, make(map[string]*Issue))
+
+	if len(issueF.Childs) != 3 {
+		log.Println("TEST: issueF - wrong child count")
+		t.Fail()
+	}
+	keys := ""
+	for _, i := range issueF.Childs {
+		keys += i.Key
+	}
+	if keys != "DEA" {
+		log.Println("TEST: issueF - wrong childs")
+		t.Fail()
+	}
+
+	if len(issueE.Childs) != 1 {
+		log.Println("TEST: issueE - wrong child count")
+		t.Fail()
+	}
+	if issueE.Childs[0].Key != "C" {
+		log.Println("TEST: issueE - wrong childs")
+		t.Fail()
+	}
+
+	if len(issueC.Childs) != 1 {
+		log.Println("TEST: issueC - wrong child count")
+		t.Fail()
+	}
+	if issueC.Childs[0].Key != "B" {
+		log.Println("TEST: issueE - wrong childs")
+		t.Fail()
+	}
+
+	if len(issueD.Childs) != 0 ||
+		len(issueB.Childs) != 0 ||
+		len(issueA.Childs) != 0 {
+		log.Println("TEST: issueD/B/A - wrong child count")
+		t.Fail()
+	}
 }

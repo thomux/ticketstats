@@ -106,15 +106,21 @@ func linkParentsRecursive(issue *Issue) {
 	}
 }
 
+// removeDuplicateChildsRecursive removes duplicate child links recursive
+// childs which are linked form multiple tree levels will be linked to the
+// highest tree node.
 func removeDuplicateChildsRecursive(issue *Issue, set map[string]*Issue) {
 	if len(issue.Childs) > 0 {
+		issue.Childs = removeDuplicates(issue.Childs, set)
 		for _, child := range issue.Childs {
 			removeDuplicateChildsRecursive(child, set)
 		}
-		issue.Childs = removeDuplicates(issue.Childs, set)
 	}
 }
 
+// removeDuplicates reduce the given issue list to contain all issues only
+// once (list to set). All issues contained in the given set will be removed
+// completely (list set minus given set).
 func removeDuplicates(issues []*Issue, set map[string]*Issue) []*Issue {
 	filtered := make([]*Issue, 0)
 
@@ -129,7 +135,10 @@ func removeDuplicates(issues []*Issue, set map[string]*Issue) []*Issue {
 	return filtered
 }
 
-func PrintClusters(issues []*Issue, shorten bool) {
+// PrintClusters print the "clusters" contained in the given issue list,
+// i.e. if a issue has childs, the whole tree is printed, if a issue has
+// no childs, it is skipped.
+func PrintClusters(issues []*Issue) {
 	i := 1
 	for _, issue := range issues {
 		if len(issue.Parents) > 0 {
@@ -140,22 +149,20 @@ func PrintClusters(issues []*Issue, shorten bool) {
 			fmt.Println("Cluster", i)
 			i++
 			fmt.Printf("%s %s [%s]\n", issue.Key, issue.Summary, issue.Status)
-			printClustersRecursive(issue.Childs, shorten, "|-")
+			printClustersRecursive(issue.Childs, "|-")
 		}
 	}
 }
 
-func printClustersRecursive(issues []*Issue, shorten bool, prefix string) {
+// printClustersRecursive prints recursive the "clusters" contained in the given
+// issue list.
+func printClustersRecursive(issues []*Issue, prefix string) {
 	for _, issue := range issues {
 		fmt.Printf("%s %s %s [%s]\n", prefix, issue.Key, issue.Summary, issue.Status)
-		for j, child := range issue.Childs {
+		for _, child := range issue.Childs {
 			fmt.Printf("%s %s %s [%s]\n", prefix, child.Key, child.Summary, child.Status)
-			if shorten && j > 9 {
-				fmt.Println(prefix, "   ...", len(issue.Childs), "childs")
-				break
-			}
 			if len(child.Childs) > 0 {
-				printClustersRecursive(child.Childs, shorten, "| "+prefix)
+				printClustersRecursive(child.Childs, "| "+prefix)
 			}
 		}
 	}
