@@ -73,7 +73,7 @@ func Evaluate(path string,
 
 func (ts *TicketStats) generateReport() {
 	// Reduce to active tickets
-	ts.active = ActiveTickets(ts.issues)
+	ts.active = ActiveTickets(ts.issues, ts.config)
 	log.Println("INFO:", len(ts.active), "active tickets.")
 
 	ts.sanitize()
@@ -121,7 +121,7 @@ func (ts *TicketStats) oldBugs() {
 
 func (ts *TicketStats) bugs() {
 	bugs := FilterByType(ts.issues, "Bug")
-	openBugs := OpenTickets(bugs)
+	openBugs := OpenTickets(bugs, ts.config)
 
 	filterStates := []string{"Verification", "Acceptace", "Integration"}
 
@@ -190,7 +190,7 @@ func (ts *TicketStats) bugs() {
 
 func (ts *TicketStats) features() {
 	features := FilterByType(ts.issues, "New Feature")
-	openFeatures := OpenTickets(features)
+	openFeatures := OpenTickets(features, ts.config)
 	OrderByDue(openFeatures)
 
 	for _, feature := range openFeatures {
@@ -203,7 +203,7 @@ func (ts *TicketStats) features() {
 
 func (ts *TicketStats) improvements() {
 	improvements := FilterByType(ts.issues, "Improvement")
-	openImprovements := OpenTickets(improvements)
+	openImprovements := OpenTickets(improvements, ts.config)
 	OrderByDue(openImprovements)
 
 	for _, improvement := range openImprovements {
@@ -219,11 +219,11 @@ func (ts *TicketStats) other() {
 		return !(issue.Type == "Bug" || issue.Type == "New Feature" || issue.Type == "Improvement")
 	})
 
-	ts.report.Other.Count = len(OpenTickets(others))
+	ts.report.Other.Count = len(OpenTickets(others, ts.config))
 
 	for _, t := range Types(others) {
 		issues := FilterByType(others, t)
-		count := len(OpenTickets(issues))
+		count := len(OpenTickets(issues, ts.config))
 
 		statWeek := OtherTypeStats{
 			Count: count,

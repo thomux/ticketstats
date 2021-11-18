@@ -7,22 +7,26 @@ import (
 )
 
 // ActiveTickets returns all active tickets.
-func ActiveTickets(issues []*Issue) []*Issue {
+func ActiveTickets(issues []*Issue, config Config) []*Issue {
 	noDate := time.Time{}
-
 	return Filter(issues, func(issue *Issue) bool {
-		return (issue.Resolved == noDate && issue.Status != "Closed") || lastMonth(issue.Updated)
+		return (issue.Resolved == noDate &&
+			issue.Status != config.States.Closed) ||
+			lastMonth(issue.Updated)
 	})
 }
 
-func OpenTickets(issues []*Issue) []*Issue {
+// OpenTickets returns all tickets with no resolution date and state not close.
+func OpenTickets(issues []*Issue, config Config) []*Issue {
 	noDate := time.Time{}
-
 	return Filter(issues, func(issue *Issue) bool {
-		return issue.Resolved == noDate && issue.Status != "Closed"
+		return issue.Resolved == noDate &&
+			issue.Status != config.States.Closed
 	})
 }
 
+// Filter filters the given issue list using the given test function.
+// A issue is part of the returned list if the test function returns true.
 func Filter(issues []*Issue, test func(issue *Issue) bool) []*Issue {
 	result := make([]*Issue, 0)
 
@@ -35,6 +39,7 @@ func Filter(issues []*Issue, test func(issue *Issue) bool) []*Issue {
 	return result
 }
 
+// FixVersions returns a list of all fix versions assigned to the given tickets.
 func FixVersions(issues []*Issue) []string {
 	result := make([]string, 0)
 	fixVersions := make(map[string]int)
@@ -52,6 +57,7 @@ func FixVersions(issues []*Issue) []string {
 	return result
 }
 
+// SecurityLevels provides a list of all security levels assigned to the tickets.
 func SecurityLevels(issues []*Issue) []string {
 	result := make([]string, 0)
 	security := make(map[string]int)
@@ -67,6 +73,7 @@ func SecurityLevels(issues []*Issue) []string {
 	return result
 }
 
+// Types returns a list of all ticket types contained in the given list.
 func Types(issues []*Issue) []string {
 	result := make([]string, 0)
 	types := make(map[string]int)
@@ -82,6 +89,7 @@ func Types(issues []*Issue) []string {
 	return result
 }
 
+// Labels returns a list of all labels assigned to the given tickets.
 func Labels(issues []*Issue) []string {
 	result := make([]string, 0)
 	labels := make(map[string]int)
@@ -99,6 +107,7 @@ func Labels(issues []*Issue) []string {
 	return result
 }
 
+// Components returns a list of all components assigned to the given tickets.
 func Components(issues []*Issue) []string {
 	result := make([]string, 0)
 	components := make(map[string]int)
@@ -116,6 +125,7 @@ func Components(issues []*Issue) []string {
 	return result
 }
 
+// contains is a helper to check if a string is contained in a string list.
 func contains(slice []string, item string) bool {
 	set := make(map[string]struct{}, len(slice))
 	for _, s := range slice {
@@ -126,18 +136,24 @@ func contains(slice []string, item string) bool {
 	return ok
 }
 
+// FilterByFixVersion reduces the given list to contain only tickets with the
+// given fix version.
 func FilterByFixVersion(issues []*Issue, fixVersion string) []*Issue {
 	return Filter(issues, func(issue *Issue) bool {
 		return contains(issue.FixVersions, fixVersion)
 	})
 }
 
+// FilterBySecurityLevel reduces the given list to contain only tickets with the
+// given security level.
 func FilterBySecurityLevel(issues []*Issue, securityLevel string) []*Issue {
 	return Filter(issues, func(issue *Issue) bool {
 		return issue.SecurityLevel == securityLevel
 	})
 }
 
+// FilterByPriority reduces the given list to contain only tickets with the
+// given priority.
 func FilterByPriority(issues []*Issue, priority string) []*Issue {
 	return Filter(issues, func(issue *Issue) bool {
 		return issue.Priority == priority

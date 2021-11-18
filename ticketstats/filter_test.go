@@ -31,7 +31,7 @@ func TestActiveTickets(t *testing.T) {
 	issues = append(issues, issue)
 
 	// call function to test
-	issues = ActiveTickets(issues)
+	issues = ActiveTickets(issues, DefaultConfig())
 
 	if len(issues) != 2 {
 		log.Println("TEST: issue count not expected")
@@ -48,6 +48,290 @@ func TestActiveTickets(t *testing.T) {
 		strings.Contains(keys, "C") {
 
 		log.Println("TEST: issue count not expected")
+		t.Fail()
+	}
+}
+
+func TestOpenTickets(t *testing.T) {
+	config := DefaultConfig()
+	issues := make([]*Issue, 0)
+
+	issue := NewIssue()
+	issue.Key = "A"
+	issue.Resolved = time.Now().AddDate(0, 0, -5)
+	issue.Updated = time.Now()
+	issues = append(issues, issue)
+
+	issue = NewIssue()
+	issue.Key = "B"
+	issues = append(issues, issue)
+
+	issue = NewIssue()
+	issue.Key = "C"
+	issue.Resolved = time.Now().AddDate(0, -2, 0)
+	issue.Updated = time.Now().AddDate(0, -1, -10)
+	issues = append(issues, issue)
+
+	issue = NewIssue()
+	issue.Key = "D"
+	issue.Status = config.States.Closed
+	issues = append(issues, issue)
+
+	issues = OpenTickets(issues, config)
+
+	if len(issues) != 1 {
+		log.Println("TEST: issue count not expected")
+		t.Fail()
+	}
+	if issues[0].Key != "B" {
+		log.Println("TEST: wrong issue")
+		t.Fail()
+	}
+}
+
+func TestFilter(t *testing.T) {
+	issues := make([]*Issue, 0)
+
+	issue := NewIssue()
+	issue.Key = "A"
+	issues = append(issues, issue)
+
+	issue = NewIssue()
+	issue.Key = "B"
+	issues = append(issues, issue)
+
+	result := Filter(issues, func(issue *Issue) bool {
+		return issue.Key == "A"
+	})
+
+	if len(result) != 1 {
+		t.Fail()
+	}
+	if result[0].Key != "A" {
+		t.Fail()
+	}
+}
+
+func TestFixVersions(t *testing.T) {
+	issues := make([]*Issue, 0)
+
+	issue := NewIssue()
+	issue.FixVersions = append(issue.FixVersions, "1", "2")
+	issues = append(issues, issue)
+
+	issue = NewIssue()
+	issue.FixVersions = append(issue.FixVersions, "3", "2")
+	issues = append(issues, issue)
+
+	versions := FixVersions(issues)
+
+	str := ""
+	for _, v := range versions {
+		str += v
+	}
+	if str != "123" {
+		t.Fail()
+	}
+}
+
+func TestSecurityLevels(t *testing.T) {
+	issues := make([]*Issue, 0)
+
+	issue := NewIssue()
+	issue.SecurityLevel = "A"
+	issues = append(issues, issue)
+
+	issue = NewIssue()
+	issue.SecurityLevel = "B"
+	issues = append(issues, issue)
+
+	issue = NewIssue()
+	issue.SecurityLevel = "A"
+	issues = append(issues, issue)
+
+	security := SecurityLevels(issues)
+
+	str := ""
+	for _, v := range security {
+		str += v
+	}
+	if str != "AB" {
+		t.Fail()
+	}
+}
+
+func TestTypes(t *testing.T) {
+	issues := make([]*Issue, 0)
+
+	issue := NewIssue()
+	issue.Type = "A"
+	issues = append(issues, issue)
+
+	issue = NewIssue()
+	issue.Type = "B"
+	issues = append(issues, issue)
+
+	issue = NewIssue()
+	issue.Type = "A"
+	issues = append(issues, issue)
+
+	types := Types(issues)
+
+	str := ""
+	for _, v := range types {
+		str += v
+	}
+	if str != "AB" {
+		t.Fail()
+	}
+}
+
+func TestLabels(t *testing.T) {
+	issues := make([]*Issue, 0)
+
+	issue := NewIssue()
+	issue.Labels = append(issue.Labels, "1", "2")
+	issues = append(issues, issue)
+
+	issue = NewIssue()
+	issue.Labels = append(issue.Labels, "3", "2")
+	issues = append(issues, issue)
+
+	labels := Labels(issues)
+
+	str := ""
+	for _, v := range labels {
+		str += v
+	}
+	if str != "123" {
+		t.Fail()
+	}
+}
+
+func TestComponents(t *testing.T) {
+	issues := make([]*Issue, 0)
+
+	issue := NewIssue()
+	issue.Components = append(issue.Components, "1", "2")
+	issues = append(issues, issue)
+
+	issue = NewIssue()
+	issue.Components = append(issue.Components, "3", "2")
+	issues = append(issues, issue)
+
+	components := Components(issues)
+
+	str := ""
+	for _, v := range components {
+		str += v
+	}
+	if str != "123" {
+		t.Fail()
+	}
+}
+
+func TestContains(t *testing.T) {
+	list := []string{"A", "B", "C"}
+	if !contains(list, "A") {
+		t.Fail()
+	}
+	if contains(list, "D") {
+		t.Fail()
+	}
+}
+
+func TestFilterByFixVersion(t *testing.T) {
+	issues := make([]*Issue, 0)
+
+	issue := NewIssue()
+	issue.Key = "A"
+	issue.FixVersions = append(issue.FixVersions, "A", "B")
+	issues = append(issues, issue)
+
+	issue = NewIssue()
+	issue.Key = "B"
+	issue.FixVersions = append(issue.FixVersions, "B")
+	issues = append(issues, issue)
+
+	issue = NewIssue()
+	issue.Key = "C"
+	issue.FixVersions = append(issue.FixVersions, "C", "D")
+	issues = append(issues, issue)
+
+	result := FilterByFixVersion(issues, "B")
+
+	if len(result) != 2 {
+		t.Fail()
+	}
+	keys := ""
+	for _, i := range result {
+		keys += i.Key
+	}
+	if keys != "AB" {
+		t.Fail()
+	}
+}
+
+func TestFilterBySecurityLevel(t *testing.T) {
+	issues := make([]*Issue, 0)
+
+	issue := NewIssue()
+	issue.Key = "A"
+	issue.SecurityLevel = "B"
+	issues = append(issues, issue)
+
+	issue = NewIssue()
+	issue.Key = "B"
+	issue.SecurityLevel = "B"
+	issues = append(issues, issue)
+
+	issue = NewIssue()
+	issue.Key = "C"
+	issue.SecurityLevel = "D"
+	issues = append(issues, issue)
+
+	result := FilterBySecurityLevel(issues, "B")
+
+	if len(result) != 2 {
+		t.Fail()
+	}
+	keys := ""
+	for _, i := range result {
+		keys += i.Key
+	}
+	if keys != "AB" {
+		t.Fail()
+	}
+}
+
+func TestFilterByPriority(t *testing.T) {
+	issues := make([]*Issue, 0)
+
+	issue := NewIssue()
+	issue.Key = "A"
+	issue.Priority = "B"
+	issues = append(issues, issue)
+
+	issue = NewIssue()
+	issue.Key = "B"
+	issue.Priority = "B"
+	issues = append(issues, issue)
+
+	issue = NewIssue()
+	issue.Key = "C"
+	issue.Priority = "D"
+	issues = append(issues, issue)
+
+	result := FilterByPriority(issues, "B")
+
+	if len(result) != 2 {
+		t.Fail()
+	}
+	keys := ""
+	for _, i := range result {
+		keys += i.Key
+	}
+	if keys != "AB" {
 		t.Fail()
 	}
 }
@@ -424,6 +708,43 @@ func TestFilterByType(t *testing.T) {
 	}
 }
 
+func TestFilterByLabel(t *testing.T) {
+	issues := make([]*Issue, 0)
+
+	issue := NewIssue()
+	issue.Key = "A"
+	issue.Components = append(issue.Components, "X")
+	issues = append(issues, issue)
+
+	issue = NewIssue()
+	issue.Key = "B"
+	issue.Components = append(issue.Components, "Y", "X")
+	issues = append(issues, issue)
+
+	issue = NewIssue()
+	issue.Key = "C"
+	issue.Components = append(issue.Components, "Z")
+	issues = append(issues, issue)
+
+	// call function to test
+	issues = FilterByComponent(issues, "X")
+
+	if len(issues) != 2 {
+		log.Println("TEST: issue count not expected")
+		t.Fail()
+	}
+
+	keys := ""
+	for _, i := range issues {
+		keys += i.Key
+	}
+	if keys != "AB" {
+
+		log.Println("TEST: wrong issues")
+		t.Fail()
+	}
+}
+
 func TestFilterByComponent(t *testing.T) {
 	issues := make([]*Issue, 0)
 
@@ -484,6 +805,99 @@ func TestOrderByCreated(t *testing.T) {
 
 	// call function to test
 	OrderByCreated(issues)
+
+	keys := ""
+	for _, i := range issues {
+		keys += i.Key
+	}
+
+	if keys != "BAC" {
+		log.Println("TEST: wrong order")
+		t.Fail()
+	}
+}
+
+func TestOrderByDue(t *testing.T) {
+	issues := make([]*Issue, 0)
+
+	issue := NewIssue()
+	issue.Key = "A"
+	issue.Due = time.Now().AddDate(0, -1, 0)
+	issues = append(issues, issue)
+
+	issue = NewIssue()
+	issue.Key = "B"
+	issue.Due = time.Now().AddDate(0, -1, -1)
+	issues = append(issues, issue)
+
+	issue = NewIssue()
+	issue.Key = "C"
+	issue.Due = time.Now().AddDate(0, 0, -20)
+	issues = append(issues, issue)
+
+	OrderByDue(issues)
+
+	keys := ""
+	for _, i := range issues {
+		keys += i.Key
+	}
+
+	if keys != "BAC" {
+		log.Println("TEST: wrong order")
+		t.Fail()
+	}
+}
+
+func TestOrderByPriority(t *testing.T) {
+	issues := make([]*Issue, 0)
+
+	issue := NewIssue()
+	issue.Key = "A"
+	issue.Priority = "b"
+	issues = append(issues, issue)
+
+	issue = NewIssue()
+	issue.Key = "B"
+	issue.Priority = "a"
+	issues = append(issues, issue)
+
+	issue = NewIssue()
+	issue.Key = "C"
+	issue.Priority = "c"
+	issues = append(issues, issue)
+
+	OrderByPriority(issues)
+
+	keys := ""
+	for _, i := range issues {
+		keys += i.Key
+	}
+
+	if keys != "BAC" {
+		log.Println("TEST: wrong order")
+		t.Fail()
+	}
+}
+
+func TestOrderByStatus(t *testing.T) {
+	issues := make([]*Issue, 0)
+
+	issue := NewIssue()
+	issue.Key = "A"
+	issue.Status = "b"
+	issues = append(issues, issue)
+
+	issue = NewIssue()
+	issue.Key = "B"
+	issue.Status = "a"
+	issues = append(issues, issue)
+
+	issue = NewIssue()
+	issue.Key = "C"
+	issue.Status = "c"
+	issues = append(issues, issue)
+
+	OrderByStatus(issues)
 
 	keys := ""
 	for _, i := range issues {
@@ -603,48 +1017,4 @@ func TestLastYear(t *testing.T) {
 		log.Println("TEST: date not within last year")
 		t.Fail()
 	}
-}
-
-func TestOpenTickets(t *testing.T) {
-	t.Fail()
-}
-
-func TestFixVersions(t *testing.T) {
-	t.Fail()
-}
-
-func TestSecurityLevels(t *testing.T) {
-	t.Fail()
-}
-
-func TestFilterByFixVersion(t *testing.T) {
-	t.Fail()
-}
-
-func TestFilterBySecurityLevel(t *testing.T) {
-	t.Fail()
-}
-
-func TestFilterByPriority(t *testing.T) {
-	t.Fail()
-}
-
-func TestFilter(t *testing.T) {
-	t.Fail()
-}
-
-func TestOrderByDue(t *testing.T) {
-	t.Fail()
-}
-
-func TestOrderByPriority(t *testing.T) {
-	t.Fail()
-}
-
-func TestOrderByStatus(t *testing.T) {
-	t.Fail()
-}
-
-func TestTypes(t *testing.T) {
-	t.Fail()
 }
