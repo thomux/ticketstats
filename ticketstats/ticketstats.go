@@ -89,7 +89,7 @@ func (ts *TicketStats) generateReport() {
 
 func (ts *TicketStats) sanitize() {
 	// Check tickets for issues
-	result := Sanitize(ts.issues, ts.ignoreOld)
+	result := Sanitize(ts.issues, ts.ignoreOld, ts.config)
 	ts.report.Warnings = result.ToWarnings(ts.jiraBase)
 	if ts.report.Warnings.Count > 0 {
 		ts.report.HasWarnings = true

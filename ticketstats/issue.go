@@ -49,10 +49,10 @@ func formatWork(w Work) string {
 }
 
 // WorkLog.ToString converts a WorkLog to a string for printing.
-func (workLog WorkLog) ToString() string {
+func (workLog WorkLog) ToString(config Config) string {
 	return fmt.Sprintf("%s: %s - %s\n",
 		workLog.Activity,
-		workLog.Date.Format("2006-01-02"),
+		workLog.Date.Format(config.Formats.Date),
 		formatWork(workLog.Hours))
 }
 
@@ -140,7 +140,7 @@ func (issue *Issue) IsResolved() bool {
 }
 
 // Issue.ToString creates a string representation of the issue for console.
-func (issue *Issue) ToString() string {
+func (issue *Issue) ToString(config Config) string {
 	str := ""
 
 	var noDate time.Time
@@ -156,9 +156,12 @@ func (issue *Issue) ToString() string {
 	str += fmt.Sprintf("Priority: %s\n", issue.Priority)
 	str += fmt.Sprintf("Assignee: %s\n", issue.Assignee)
 	str += fmt.Sprintf("Creator: %s\n", issue.Creator)
-	str += fmt.Sprintf("Created: %s\n", issue.Created.Format("2006-01-02"))
-	str += fmt.Sprintf("Updated: %s\n", issue.Updated.Format("2006-01-02"))
-	str += fmt.Sprintf("Last viewed: %s\n", issue.LastViewed.Format("2006-01-02"))
+	str += fmt.Sprintf("Created: %s\n",
+		issue.Created.Format(config.Formats.Date))
+	str += fmt.Sprintf("Updated: %s\n",
+		issue.Updated.Format(config.Formats.Date))
+	str += fmt.Sprintf("Last viewed: %s\n",
+		issue.LastViewed.Format(config.Formats.Date))
 	if len(issue.AffectsVersions) > 0 {
 		str += fmt.Sprintf("Affects versions: %+v\n", issue.AffectsVersions)
 	}
@@ -169,7 +172,7 @@ func (issue *Issue) ToString() string {
 	if len(issue.LogWorks) > 0 {
 		str += "Work Logs:\n"
 		for _, l := range issue.LogWorks {
-			str += "- " + l.ToString()
+			str += "- " + l.ToString(config)
 		}
 	}
 	if issue.OriginalEstimate > 0 {
@@ -203,10 +206,11 @@ func (issue *Issue) ToString() string {
 	}
 	if issue.Resolved != noDate {
 		str += fmt.Sprintf("Resolved: %s\n",
-			issue.Resolved.Format("2006-01-02"))
+			issue.Resolved.Format(config.Formats.Date))
 	}
 	if issue.Due != noDate {
-		str += fmt.Sprintf("Due: %s\n", issue.Due.Format("2006-01-02"))
+		str += fmt.Sprintf("Due: %s\n",
+			issue.Due.Format(config.Formats.Date))
 	}
 	if len(issue.LinkBlocks) > 0 {
 		str += fmt.Sprintf("Links block: %+v\n", issue.LinkBlocks)

@@ -7,6 +7,7 @@ import (
 )
 
 func TestAreBookingsValid(t *testing.T) {
+	config := DefaultConfig()
 	issue := NewIssue()
 	issue.Key = "A"
 	issue.CustomActivity = "123457"
@@ -23,7 +24,7 @@ func TestAreBookingsValid(t *testing.T) {
 		Date:     time.Now(),
 	})
 
-	valid, _ := issue.AreBookingsValid(false)
+	valid, _ := issue.AreBookingsValid(false, config)
 
 	if !valid {
 		log.Println("TEST: issue should be valid")
@@ -36,7 +37,7 @@ func TestAreBookingsValid(t *testing.T) {
 		Date:     time.Now(),
 	})
 
-	valid, logs := issue.AreBookingsValid(false)
+	valid, logs := issue.AreBookingsValid(false, config)
 
 	if valid {
 		log.Println("TEST: issue should be invalid")
@@ -90,7 +91,7 @@ func TestSanitize(t *testing.T) {
 
 	issues = append(issues, issue)
 
-	result := Sanitize(issues, false)
+	result := Sanitize(issues, false, DefaultConfig())
 
 	if len(result.NoActivity) != 1 {
 		log.Println("TEST: wrong count of issues with no activity")

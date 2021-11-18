@@ -6,6 +6,12 @@ type Config struct {
 	Types    ConfigTypeNames
 	States   ConfigStateNames
 	Customs  ConfigCustomFields
+	Formats  ConfigFormats
+}
+
+// ConfigFormats groups format strings.
+type ConfigFormats struct {
+	Date string
 }
 
 // ConfigTypeNames groups the type name strings.
@@ -35,6 +41,8 @@ func DefaultConfig() Config {
 	var config Config
 
 	config.Template = ""
+
+	config.Formats.Date = "2006-01-02"
 
 	config.Types.Bug = "Bug"
 	config.Types.Feature = "New Feature"

@@ -31,7 +31,9 @@ func NewInvalidWorkLog(issue *Issue) InvalidWorkLog {
 // AreBookingsValid checks if the work logs of the issue are consistent.
 // The first value of the result is true if all logs are ok, the second
 // is a list of invalid logs.
-func (issue *Issue) AreBookingsValid(ignoreOld bool) (bool, []WorkLog) {
+func (issue *Issue) AreBookingsValid(ignoreOld bool,
+	config Config) (bool, []WorkLog) {
+
 	activity := strings.TrimSpace(issue.CustomActivity)
 	valid := true
 	invalidLogs := make([]WorkLog, 0)
@@ -46,7 +48,8 @@ func (issue *Issue) AreBookingsValid(ignoreOld bool) (bool, []WorkLog) {
 			continue
 		}
 		if l.Activity == "" {
-			log.Println("ERROR: WorkLog without activity!", l.ToString(), issue.Key)
+			log.Println("ERROR: WorkLog without activity!",
+				l.ToString(config), issue.Key)
 		}
 
 		if strings.Compare(l.Activity, activity) != 0 {
@@ -59,7 +62,7 @@ func (issue *Issue) AreBookingsValid(ignoreOld bool) (bool, []WorkLog) {
 }
 
 // Sanitize checks all issues for invalid state
-func Sanitize(issues []*Issue, ignoreOld bool) SanitizeResult {
+func Sanitize(issues []*Issue, ignoreOld bool, config Config) SanitizeResult {
 	noActivity := make([]*Issue, 0)
 	invalidLogs := make([]InvalidWorkLog, 0)
 
@@ -67,7 +70,7 @@ func Sanitize(issues []*Issue, ignoreOld bool) SanitizeResult {
 		// Check if activity of ticket can be found
 		if issue.CustomActivity != "" {
 			// Check tickets for wrong time bookings
-			valid, logs := issue.AreBookingsValid(ignoreOld)
+			valid, logs := issue.AreBookingsValid(ignoreOld, config)
 			if !valid {
 				invalidLog := NewInvalidWorkLog(issue)
 				invalidLog.Logs = append(invalidLog.Logs, logs...)
