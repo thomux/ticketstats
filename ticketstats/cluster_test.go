@@ -221,7 +221,73 @@ func TestClusterIssuesDuplicatesClosed(t *testing.T) {
 }
 
 func TestLinkParentsRecursive(t *testing.T) {
-	t.Fail()
+	issueA := NewIssue()
+	issueA.Key = "A"
+
+	issueB := NewIssue()
+	issueB.Key = "B"
+
+	issueC := NewIssue()
+	issueC.Key = "C"
+	issueC.Childs = append(issueC.Childs, issueA, issueB)
+
+	issueD := NewIssue()
+	issueD.Key = "D"
+
+	issueE := NewIssue()
+	issueE.Key = "E"
+	issueE.Childs = append(issueE.Childs, issueC)
+
+	issueF := NewIssue()
+	issueF.Key = "F"
+	issueF.Childs = append(issueF.Childs, issueD, issueE)
+
+	linkParentsRecursive(issueF)
+
+	if len(issueE.Parents) != 1 {
+		log.Println("TEST: issueE parents len wrong")
+		t.Fail()
+	}
+	if issueE.Parents[0].Key != "F" {
+		log.Println("TEST: issueE parent wrong")
+		t.Fail()
+	}
+
+	if len(issueD.Parents) != 1 {
+		log.Println("TEST: issueD parents len wrong")
+		t.Fail()
+	}
+	if issueD.Parents[0].Key != "F" {
+		log.Println("TEST: issueD parent wrong")
+		t.Fail()
+	}
+
+	if len(issueC.Parents) != 1 {
+		log.Println("TEST: issueD parents len wrong")
+		t.Fail()
+	}
+	if issueC.Parents[0].Key != "E" {
+		log.Println("TEST: issueD parent wrong")
+		t.Fail()
+	}
+
+	if len(issueB.Parents) != 1 {
+		log.Println("TEST: issueC parents len wrong")
+		t.Fail()
+	}
+	if issueB.Parents[0].Key != "C" {
+		log.Println("TEST: issueC parent wrong")
+		t.Fail()
+	}
+
+	if len(issueA.Parents) != 1 {
+		log.Println("TEST: issueA parents len wrong")
+		t.Fail()
+	}
+	if issueA.Parents[0].Key != "C" {
+		log.Println("TEST: issueA parent wrong")
+		t.Fail()
+	}
 }
 
 func TestRemoveDuplicateChildsRecursive(t *testing.T) {

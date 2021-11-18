@@ -80,7 +80,7 @@ func convertDate(data string) time.Time {
 	return t
 }
 
-func Parse(path string) []*Issue {
+func Parse(path string, config Config) []*Issue {
 	records := readCsvFile("JiraExport.csv")
 
 	header := records[0]
@@ -178,15 +178,15 @@ func Parse(path string) []*Issue {
 				issue.LinkLinkIssues = append(issue.LinkLinkIssues, val)
 			case "Outward issue link (parent)":
 				issue.LinkParents = append(issue.LinkParents, val)
-			case "Custom field (External ID)":
+			case config.Customs.ExternalId:
 				issue.CustomExternalId = val
-			case "Custom field (Supplier reference)":
+			case config.Customs.SupplierReference:
 				issue.CustomSupplierRef = val
-			case "Custom field (ICAS Variant)":
+			case config.Customs.Variant:
 				issue.CustomVariant = val
-			case "Custom field (Booking Account)":
+			case config.Customs.Account:
 				issue.CustomActivity = val
-			case "Custom field (Bug-Category)":
+			case config.Customs.Category:
 				issue.CustomCategory = val
 			}
 		}

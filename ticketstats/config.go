@@ -1,5 +1,6 @@
 package ticketstats
 
+// Config groups all configuration values.
 type Config struct {
 	Template string
 	Types    ConfigTypeNames
@@ -7,20 +8,29 @@ type Config struct {
 	Customs  ConfigCustomFields
 }
 
+// ConfigTypeNames groups the type name strings.
 type ConfigTypeNames struct {
 	Feature     string
 	Bug         string
 	Improvement string
 }
 
+// ConfigStateNames groups the state name strings.
 type ConfigStateNames struct {
 	Closed string
 }
 
+// ConfigCustomFields groups the custom field names.
 type ConfigCustomFields struct {
-	Account string
+	ExternalId        string
+	SupplierReference string
+	Variant           string
+	Account           string
+	Category          string
 }
 
+// DefaultConfig creates a new Config with all settings initialized using
+// default values.
 func DefaultConfig() Config {
 	var config Config
 
@@ -32,7 +42,11 @@ func DefaultConfig() Config {
 
 	config.States.Closed = "Closed"
 
+	config.Customs.ExternalId = "Custom field (External ID)"
+	config.Customs.SupplierReference = "Custom field (Supplier reference)"
+	config.Customs.Variant = "Custom field (ICAS Variant)"
 	config.Customs.Account = "Custom field (Booking Account)"
+	config.Customs.Category = "Custom field (Bug-Category)"
 
 	return config
 }

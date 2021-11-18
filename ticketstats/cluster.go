@@ -5,6 +5,7 @@ import (
 	"log"
 )
 
+// ClusterIssues builds a tree for the tickets based on the Jira issue links.
 func ClusterIssues(issues []*Issue) {
 	keyIndex := make(map[string]*Issue)
 	idIndex := make(map[string]*Issue)
@@ -97,6 +98,7 @@ func ClusterIssues(issues []*Issue) {
 	}
 }
 
+// linkParentsRecursive creates the backward links for the child issues.
 func linkParentsRecursive(issue *Issue) {
 	for _, child := range issue.Childs {
 		child.Parents = append(child.Parents, issue)

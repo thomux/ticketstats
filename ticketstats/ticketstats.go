@@ -26,8 +26,10 @@ func Evaluate(path string,
 	jiraBase string,
 	splitByComponent bool) {
 
+	config := DefaultConfig()
+
 	// read issues form csv
-	issues := Parse(path)
+	issues := Parse(path, config)
 
 	if project != "" {
 		issues = FilterByProject(issues, project)
@@ -41,7 +43,7 @@ func Evaluate(path string,
 	PrintClusters(issues, false)
 
 	ts := TicketStats{
-		config:   DefaultConfig(),
+		config:   config,
 		jiraBase: jiraBase,
 		issues:   issues,
 		report:   NewReport(),
@@ -275,7 +277,6 @@ func (ts *TicketStats) resources() {
 		for i, g := range groups {
 			percent := int((ghours[i] / hours[i]) * 100.0)
 			if percent < 3 {
-				log.Println("DEBUG: Skip", t, "too less hours")
 				continue
 			}
 
@@ -307,7 +308,6 @@ func (ts *TicketStats) resources() {
 		for i, g := range groups {
 			percent := int((ghours[i] / hours[i]) * 100.0)
 			if percent < 5 {
-				log.Println("DEBUG: Skip", l, "too less hours")
 				continue
 			}
 			g.Details = append(g.Details, ResourceDetails{
