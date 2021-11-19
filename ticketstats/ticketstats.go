@@ -27,7 +27,7 @@ func Evaluate(path string,
 	jiraBase string,
 	splitByComponent bool) {
 
-	config := DefaultConfig()
+	config := LoadConfig()
 
 	// read issues form csv
 	issues := Parse(path, config)

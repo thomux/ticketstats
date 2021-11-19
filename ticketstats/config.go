@@ -1,5 +1,11 @@
 package ticketstats
 
+import (
+	"encoding/json"
+	"io/ioutil"
+	"log"
+)
+
 // Config groups all configuration values.
 type Config struct {
 	Template string
@@ -58,5 +64,33 @@ func DefaultConfig() Config {
 	config.Customs.Account = "Custom field (Booking Account)"
 	config.Customs.Category = "Custom field (Bug-Category)"
 
+	return config
+}
+
+// saveConfig saves the default config as "config.json".
+func saveConfig() {
+	data, err := json.MarshalIndent(DefaultConfig(), "", "  ")
+	if err != nil {
+		panic(err)
+	}
+	err = ioutil.WriteFile("config.json", data, 0644)
+	if err != nil {
+		panic(err)
+	}
+}
+
+// LoadConfig loads the config or returns a default config if loading fails.
+func LoadConfig() Config {
+	data, err := ioutil.ReadFile("config.json")
+	if err != nil {
+		log.Println("INFO: no config file found")
+		return DefaultConfig()
+	}
+	var config Config
+	err = json.Unmarshal(data, &config)
+	if err != nil {
+		log.Println("ERROR: Config:", err)
+		return DefaultConfig()
+	}
 	return config
 }
