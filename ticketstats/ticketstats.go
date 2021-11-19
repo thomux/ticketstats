@@ -84,13 +84,13 @@ func (ts *TicketStats) generateReport() {
 	ts.other()
 	ts.resources()
 
-	ts.report.Render()
+	ts.report.Render(ts.config)
 }
 
 func (ts *TicketStats) sanitize() {
 	// Check tickets for issues
 	result := Sanitize(ts.issues, ts.ignoreOld, ts.config)
-	ts.report.Warnings = result.ToWarnings(ts.jiraBase)
+	ts.report.Warnings = result.ToWarnings(ts.jiraBase, ts.config)
 	if ts.report.Warnings.Count > 0 {
 		ts.report.HasWarnings = true
 	}
@@ -114,7 +114,8 @@ func (ts *TicketStats) oldBugs() {
 
 	OrderByCreated(oldBugs)
 	for _, bug := range oldBugs {
-		ts.report.OldBugs = append(ts.report.OldBugs, bug.ToReportIssue(ts.jiraBase))
+		ts.report.OldBugs = append(ts.report.OldBugs, bug.ToReportIssue(
+			ts.jiraBase, ts.config))
 	}
 	log.Println("INFO:", len(oldBugs), "old bug tickets.")
 }
@@ -175,7 +176,8 @@ func (ts *TicketStats) bugs() {
 				OrderByStatus(bs)
 				OrderByPriority(bs)
 				for _, b := range bs {
-					stat.Bugs = append(stat.Bugs, b.ToReportIssue(ts.jiraBase))
+					stat.Bugs = append(stat.Bugs,
+						b.ToReportIssue(ts.jiraBase, ts.config))
 				}
 
 				ts.report.Bugs.BugStats = append(ts.report.Bugs.BugStats, stat)
@@ -194,7 +196,7 @@ func (ts *TicketStats) features() {
 	OrderByDue(openFeatures)
 
 	for _, feature := range Clusters(openFeatures, false) {
-		rf := feature.ToReportIssue(ts.jiraBase)
+		rf := feature.ToReportIssue(ts.jiraBase, ts.config)
 		if len(rf.Parents) == 0 {
 			ts.report.Features = append(ts.report.Features, rf)
 		}
@@ -207,7 +209,7 @@ func (ts *TicketStats) improvements() {
 	OrderByDue(openImprovements)
 
 	for _, improvement := range Clusters(openImprovements, false) {
-		ri := improvement.ToReportIssue(ts.jiraBase)
+		ri := improvement.ToReportIssue(ts.jiraBase, ts.config)
 		if len(ri.Parents) == 0 {
 			ts.report.Improvements = append(ts.report.Improvements, ri)
 		}

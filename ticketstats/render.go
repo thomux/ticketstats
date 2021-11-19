@@ -12,6 +12,33 @@ import (
 //go:embed report.tmpl
 var reportTemplate string
 
+// loadTemplate loads the template.
+func loadTemplate(config Config) *template.Template {
+	var err error
+
+	t := template.New("report")
+
+	// for coloring groups in report
+	sec := false
+	t.Funcs(template.FuncMap{"second": func() bool {
+		sec = !sec
+		return sec
+	}})
+
+	if config.Template != "" {
+		t, err = t.ParseFiles(config.Template)
+	}
+
+	if config.Template == "" || err != nil {
+		t, err = t.Parse(reportTemplate)
+		if err != nil {
+			panic(err)
+		}
+	}
+
+	return t
+}
+
 // Report groups all data needed to render the HTML report.
 type Report struct {
 	Component    string
@@ -50,19 +77,23 @@ type Warnings struct {
 	InvalidBooking []InvalidBooking
 }
 
-func (sr SanitizeResult) ToWarnings(jiraBaseUrl string) Warnings {
+// SanitizeResult.ToWarnings converts a SanitizeResult to a Warnings object.
+// Warnings is a "rendered" sanitize result.
+func (sr SanitizeResult) ToWarnings(jiraBaseUrl string,
+	config Config) Warnings {
 	warnings := NewWarnings()
 	warnings.Count = len(sr.NoActivity) + len(sr.InvalidWorkLogs)
 	for _, na := range sr.NoActivity {
-		warnings.NoActivity = append(warnings.NoActivity, na.ToReportIssue(jiraBaseUrl))
+		warnings.NoActivity = append(warnings.NoActivity,
+			na.ToReportIssue(jiraBaseUrl, config))
 	}
 	for _, il := range sr.InvalidWorkLogs {
 		ib := NewInvalidBooking()
-		ib.Issue = il.Issue.ToReportIssue(jiraBaseUrl)
+		ib.Issue = il.Issue.ToReportIssue(jiraBaseUrl, config)
 		for _, wl := range il.Logs {
 			ib.Logs = append(ib.Logs, InvalidLog{
 				Activity: wl.Activity,
-				Date:     wl.Date.Format("2006-01-02"),
+				Date:     wl.Date.Format(config.Formats.Date),
 				Effort:   formatWork(wl.Hours),
 			})
 		}
@@ -212,7 +243,10 @@ type ReportIssue struct {
 	Parents     []Link
 }
 
-func (issue *Issue) ToReportIssue(jiraBaseUrl string) ReportIssue {
+// Issue.ToReportIssue converts an Issue to a ReportIssue, i.e. this
+// function renders the issue.
+func (issue *Issue) ToReportIssue(jiraBaseUrl string,
+	config Config) ReportIssue {
 	var rissue ReportIssue
 	var noDate time.Time
 
@@ -227,14 +261,15 @@ func (issue *Issue) ToReportIssue(jiraBaseUrl string) ReportIssue {
 		rissue.HasDue = false
 	} else {
 		rissue.HasDue = true
-		rissue.Due = issue.Due.Format("2006-01-02")
+		rissue.Due = issue.Due.Format(config.Formats.Date)
 		if issue.OriginalEstimate > 0.1 {
-			rissue.FTE = covertToFTE(issue.Due, issue.OriginalEstimate-issue.TimeSpend)
+			rissue.FTE = covertToFTE(issue.Due,
+				issue.OriginalEstimate-issue.TimeSpend)
 			rissue.HasEstimate = true
 		}
 	}
 	if issue.Created != noDate {
-		rissue.Created = issue.Created.Format("2006-01-02")
+		rissue.Created = issue.Created.Format(config.Formats.Date)
 		rissue.Age = convertToAge(issue.Created)
 	}
 	rissue.Labels = issue.Labels
@@ -260,18 +295,20 @@ func (issue *Issue) ToReportIssue(jiraBaseUrl string) ReportIssue {
 			Url:  jiraBaseUrl + issue.Key,
 			Name: issue.Key,
 		}
-		rissue.Childs = flattenTree(issue, parent, jiraBaseUrl)
+		rissue.Childs = flattenTree(issue, parent, jiraBaseUrl, config)
 		rissue.HasChilds = (len(rissue.Childs) > 0)
 	}
 
 	return rissue
 }
 
-func flattenTree(issue *Issue, parent Link, jiraBaseUrl string) []ReportIssue {
+// flattenTree flattens the child tree of the given issue to a list.
+func flattenTree(issue *Issue, parent Link,
+	jiraBaseUrl string, config Config) []ReportIssue {
 	childs := make([]ReportIssue, 0)
 
 	for _, child := range issue.Childs {
-		rissue := child.ToReportIssue(jiraBaseUrl)
+		rissue := child.ToReportIssue(jiraBaseUrl, config)
 		rissue.Parents = append(rissue.Parents, parent)
 		if rissue.Status != "Closed" {
 			childs = append(childs, rissue)
@@ -286,6 +323,7 @@ func flattenTree(issue *Issue, parent Link, jiraBaseUrl string) []ReportIssue {
 	return childs
 }
 
+// covertToFTE calculates the needed FTEs based on the remaining days.
 func covertToFTE(due time.Time, remainingEffort Work) string {
 	neededDays := float64(remainingEffort) / 8.0
 	remainingTime := time.Until(due)
@@ -295,6 +333,7 @@ func covertToFTE(due time.Time, remainingEffort Work) string {
 	return fmt.Sprintf("%.2f", fte)
 }
 
+// convertToAge calculates the age of days of an issue.
 func convertToAge(date time.Time) int {
 	duration := time.Since(date)
 	return int(duration.Hours()) / 24
@@ -397,7 +436,7 @@ type OtherTypeStats struct {
 }
 
 // Report.Render renders an HTMl report.
-func (report Report) Render() {
+func (report Report) Render(config Config) {
 	path := "./report_" + report.Component + ".html"
 
 	_ = os.Remove(path)
@@ -407,16 +446,7 @@ func (report Report) Render() {
 	}
 	w := bufio.NewWriter(f)
 
-	t := template.New("report")
-	sec := false
-	t.Funcs(template.FuncMap{"second": func() bool {
-		sec = !sec
-		return sec
-	}})
-	t, err = t.Parse(reportTemplate)
-	if err != nil {
-		panic(err)
-	}
+	t := loadTemplate(config)
 	err = t.ExecuteTemplate(w, "report", report)
 	if err != nil {
 		panic(err)
