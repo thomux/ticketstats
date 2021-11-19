@@ -230,17 +230,16 @@
                         {{ end }}
                     </td>
                     <td>
-                        {{ if .HasDue }}
-                        {{ if not .Overtime }}
-                            <span class="tag {{ if .AtRisk }}is-danger{{ else }}is-success{{ end }}">
-                                {{ .FTE }} FTE
-                            </span>
-                        {{ end }}
-                        {{ end }}
                         {{ if .Overtime }}
                                 <span class="tag is-danger">
                                     High Effort
                                 </span>
+                        {{ else }}
+                            {{ if .HasEstimate }}
+                                <span class="tag {{ if .AtRisk }}is-danger{{ else }}is-success{{ end }}">
+                                    {{ .FTE }} FTE
+                                </span>
+                            {{ end }}
                         {{ end }}
                     </td>
                 </tr>
@@ -279,17 +278,16 @@
                         {{ end }}
                     </td>
                     <td>
-                        {{ if .HasDue }}
-                        {{ if not .Overtime }}
-                            <span class="tag {{ if .AtRisk }}is-danger{{ else }}is-success{{ end }}">
-                                {{ .FTE }} FTE
-                            </span>
-                        {{ end }}
-                        {{ end }}
                         {{ if .Overtime }}
                                 <span class="tag is-danger">
                                     High Effort
                                 </span>
+                        {{ else }}
+                            {{ if .HasEstimate }}
+                                <span class="tag {{ if .AtRisk }}is-danger{{ else }}is-success{{ end }}">
+                                    {{ .FTE }} FTE
+                                </span>
+                            {{ end }}
                         {{ end }}
                     </td>
                 </tr>
@@ -354,17 +352,16 @@
                         {{ end }}
                     </td>
                     <td>
-                        {{ if .HasDue }}
-                        {{ if not .Overtime }}
-                            <span class="tag {{ if .AtRisk }}is-danger{{ else }}is-success{{ end }}">
-                                {{ .FTE }} FTE
-                            </span>
-                        {{ end }}
-                        {{ end }}
                         {{ if .Overtime }}
                                 <span class="tag is-danger">
                                     High Effort
                                 </span>
+                        {{ else }}
+                            {{ if .HasEstimate }}
+                                <span class="tag {{ if .AtRisk }}is-danger{{ else }}is-success{{ end }}">
+                                    {{ .FTE }} FTE
+                                </span>
+                            {{ end }}
                         {{ end }}
                     </td>
                 </tr>
@@ -403,17 +400,16 @@
                         {{ end }}
                     </td>
                     <td>
-                        {{ if .HasDue }}
-                        {{ if not .Overtime }}
-                            <span class="tag {{ if .AtRisk }}is-danger{{ else }}is-success{{ end }}">
-                                {{ .FTE }} FTE
-                            </span>
-                        {{ end }}
-                        {{ end }}
                         {{ if .Overtime }}
                                 <span class="tag is-danger">
                                     High Effort
                                 </span>
+                        {{ else }}
+                            {{ if .HasEstimate }}
+                                <span class="tag {{ if .AtRisk }}is-danger{{ else }}is-success{{ end }}">
+                                    {{ .FTE }} FTE
+                                </span>
+                            {{ end }}
                         {{ end }}
                     </td>
                 </tr>

@@ -200,6 +200,7 @@ type ReportIssue struct {
 	Status      string
 	FixVersions []string
 	Estimate    string
+	HasEstimate bool
 	TimeSpend   string
 	HasTime     bool
 	Progress    int
@@ -229,6 +230,7 @@ func (issue *Issue) ToReportIssue(jiraBaseUrl string) ReportIssue {
 		rissue.Due = issue.Due.Format("2006-01-02")
 		if issue.OriginalEstimate > 0.1 {
 			rissue.FTE = covertToFTE(issue.Due, issue.OriginalEstimate-issue.TimeSpend)
+			rissue.HasEstimate = true
 		}
 	}
 	if issue.Created != noDate {
