@@ -75,7 +75,7 @@ func OldBugs(issues []*Issue, config Config) []*Issue {
 }
 
 // ResolutionTime calculates resolution time statistics for a ticket list.
-func ResolutionTime(issues []*Issue, startDate time.Time) Stats {
+func ResolutionTime(issues []*Issue) Stats {
 	times := make([]float64, 0)
 
 	for _, issue := range issues {
@@ -122,7 +122,7 @@ func ResultionTimesByType(issues []*Issue) map[string]TimeRanges {
 		var tr TimeRanges
 
 		typeIssuesRange := ClosedLastYear(typeIssues)
-		tr.Year = ResolutionTime(typeIssuesRange, time.Now().AddDate(-1, 0, 0))
+		tr.Year = ResolutionTime(typeIssuesRange)
 
 		if tr.Year.Count == 0 {
 			// no booked work hours
@@ -130,13 +130,13 @@ func ResultionTimesByType(issues []*Issue) map[string]TimeRanges {
 		}
 
 		typeIssuesRange = ClosedLastQuarter(typeIssuesRange)
-		tr.Quarter = ResolutionTime(typeIssuesRange, time.Now().AddDate(0, -3, 0))
+		tr.Quarter = ResolutionTime(typeIssuesRange)
 
 		typeIssuesRange = ClosedLastMonth(typeIssuesRange)
-		tr.Month = ResolutionTime(typeIssuesRange, time.Now().AddDate(0, -1, 0))
+		tr.Month = ResolutionTime(typeIssuesRange)
 
 		typeIssuesRange = ClosedLastWeek(typeIssuesRange)
-		tr.Week = ResolutionTime(typeIssuesRange, time.Now().AddDate(0, 0, -7))
+		tr.Week = ResolutionTime(typeIssuesRange)
 
 		result[t] = tr
 	}
