@@ -30,7 +30,8 @@ type ConfigTypeNames struct {
 
 // ConfigStateNames groups the state name strings.
 type ConfigStateNames struct {
-	Closed string
+	Closed    string
+	BugFilter []string
 }
 
 // ConfigCustomFields groups the custom field names.
@@ -57,6 +58,8 @@ func DefaultConfig() Config {
 	config.Types.Improvement = "Improvement"
 
 	config.States.Closed = "Closed"
+	config.States.BugFilter = []string{"Verification", "Acceptace",
+		"Integration", "Closed"}
 
 	config.Customs.ExternalId = "Custom field (External ID)"
 	config.Customs.SupplierReference = "Custom field (Supplier reference)"

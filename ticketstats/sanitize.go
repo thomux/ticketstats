@@ -77,7 +77,7 @@ func Sanitize(issues []*Issue, ignoreOld bool, config Config) SanitizeResult {
 				invalidLogs = append(invalidLogs, invalidLog)
 			}
 		} else {
-			if issue.Status != "Closed" {
+			if issue.Status != config.States.Closed {
 				noActivity = append(noActivity, issue)
 			}
 		}

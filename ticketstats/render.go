@@ -310,11 +310,11 @@ func flattenTree(issue *Issue, parent Link,
 	for _, child := range issue.Childs {
 		rissue := child.ToReportIssue(jiraBaseUrl, config)
 		rissue.Parents = append(rissue.Parents, parent)
-		if rissue.Status != "Closed" {
+		if rissue.Status != config.States.Closed {
 			childs = append(childs, rissue)
 		}
 		for _, rc := range rissue.Childs {
-			if rc.Status != "Closed" {
+			if rc.Status != config.States.Closed {
 				childs = append(childs, rc)
 			}
 		}

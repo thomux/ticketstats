@@ -50,7 +50,7 @@ func Evaluate(path string,
 		report:   NewReport(),
 	}
 	ts.report.Component = component
-	ts.report.Date = time.Now().Format("2006-01-02")
+	ts.report.Date = time.Now().Format(config.Formats.Date)
 	ts.ignoreOld = true
 	ts.generateReport()
 
@@ -65,7 +65,7 @@ func Evaluate(path string,
 				report:   NewReport(),
 			}
 			ts.report.Component = component
-			ts.report.Date = time.Now().Format("2006-01-02")
+			ts.report.Date = time.Now().Format(config.Formats.Date)
 			ts.ignoreOld = true
 			ts.generateReport()
 		}
@@ -103,7 +103,7 @@ func (ts *TicketStats) sanitize() {
 func (ts *TicketStats) oldBugs() {
 	oldBugs := OldBugs(ts.active, ts.config)
 
-	filterStates := []string{"Verification", "Acceptace", "Integration"}
+	filterStates := ts.config.States.BugFilter
 
 	oldBugs = Filter(oldBugs, func(issue *Issue) bool {
 		keep := true
@@ -126,10 +126,10 @@ func (ts *TicketStats) oldBugs() {
 
 // bugs generates the bug report data.
 func (ts *TicketStats) bugs() {
-	bugs := FilterByType(ts.issues, "Bug")
+	bugs := FilterByType(ts.issues, ts.config.Types.Bug)
 	openBugs := OpenTickets(bugs, ts.config)
 
-	filterStates := []string{"Verification", "Acceptace", "Integration"}
+	filterStates := ts.config.States.BugFilter
 
 	openBugs = Filter(openBugs, func(issue *Issue) bool {
 		keep := true
@@ -197,7 +197,7 @@ func (ts *TicketStats) bugs() {
 
 // features generates the feature report data.
 func (ts *TicketStats) features() {
-	features := FilterByType(ts.issues, "New Feature")
+	features := FilterByType(ts.issues, ts.config.Types.Feature)
 	openFeatures := OpenTickets(features, ts.config)
 	OrderByDue(openFeatures)
 
@@ -211,7 +211,7 @@ func (ts *TicketStats) features() {
 
 // improvements generates the improvement report data.
 func (ts *TicketStats) improvements() {
-	improvements := FilterByType(ts.issues, "Improvement")
+	improvements := FilterByType(ts.issues, ts.config.Types.Improvement)
 	openImprovements := OpenTickets(improvements, ts.config)
 	OrderByDue(openImprovements)
 
@@ -226,7 +226,9 @@ func (ts *TicketStats) improvements() {
 // other generates the other issue report data.
 func (ts *TicketStats) other() {
 	others := Filter(ts.issues, func(issue *Issue) bool {
-		return !(issue.Type == "Bug" || issue.Type == "New Feature" || issue.Type == "Improvement")
+		return !(issue.Type == ts.config.Types.Bug ||
+			issue.Type == ts.config.Types.Feature ||
+			issue.Type == ts.config.Types.Improvement)
 	})
 
 	ts.report.Other.Count = len(OpenTickets(others, ts.config))
