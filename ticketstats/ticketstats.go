@@ -32,8 +32,14 @@ func Evaluate(path string,
 	// read issues form csv
 	issues := Parse(path, config)
 
+	if project == "" {
+		project = config.Project
+	}
 	if project != "" {
 		issues = FilterByProject(issues, project)
+	}
+	if component == "" {
+		component = config.Component
 	}
 	if component != "" {
 		issues = FilterByComponent(issues, component)

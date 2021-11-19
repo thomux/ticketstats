@@ -8,11 +8,13 @@ import (
 
 // Config groups all configuration values.
 type Config struct {
-	Template string
-	Types    ConfigTypeNames
-	States   ConfigStateNames
-	Customs  ConfigCustomFields
-	Formats  ConfigFormats
+	Template  string
+	Component string
+	Project   string
+	Types     ConfigTypeNames
+	States    ConfigStateNames
+	Customs   ConfigCustomFields
+	Formats   ConfigFormats
 }
 
 // ConfigFormats groups format strings.
@@ -47,8 +49,6 @@ type ConfigCustomFields struct {
 // default values.
 func DefaultConfig() Config {
 	var config Config
-
-	config.Template = ""
 
 	config.Formats.Date = "2006-01-02"
 	config.Formats.JiraDate = "02/Jan/06 3:04 PM"
