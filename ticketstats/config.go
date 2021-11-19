@@ -87,6 +87,7 @@ func LoadConfig() Config {
 	data, err := ioutil.ReadFile("config.json")
 	if err != nil {
 		log.Println("INFO: no config file found")
+		saveConfig()
 		return DefaultConfig()
 	}
 	var config Config
