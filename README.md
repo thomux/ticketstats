@@ -1,6 +1,6 @@
-# TicketStats
+# JiraTicketStats
 
-TicketStats is small tool to evaluate Jira tickets.
+JiraTicketStats is small tool to evaluate Jira tickets.
 
 ## Usage
 
@@ -11,15 +11,13 @@ project = "XXX" and component = XXX and (resolutiondate is EMPTY or resolutionda
 ```
 
 This query can be exported as CVS, separated by Semicolons, and used as input
-for this tool.
-
-To run the evaluation, you can use the command:
+for this tool. To generate the report, run:
 
 ``` bash
 jiraticketstats -csv <path to your export>
 ```
 
-The tool supports some parameters:
+JiraTicketStats supports the following parameters:
 
 - csv: Path to the Jira export.
 - jira: Jira base URL to generate links. This URL + issue key should be valid.
@@ -27,26 +25,100 @@ The tool supports some parameters:
 - component: Component name to filter the issue set.
 - splitByComponent: Generate a report for each components of the issue set.
 
-### Architecture
+## Example
 
-The tool is implemented using the package `ticketstats` and split in different
+// TODO: write
+
+## Report
+
+The output of JiraTicketStats is an HTML report containing the following sections:
+
+- Old bug tickets
+- Bug tickets
+- Features
+- Improvements
+- Other tickets
+- Resources
+- Warnings
+
+### Old bug tickets
+
+The old bug tickets section consists of a table listing all bug tickets older
+than 30 days. For each ticket the following data is displayed:
+
+- Issue: Jira ticket key and summary. The key is a link to the ticket in Jira.
+- Age: The age of the tickets as days, calculated using the Jira creation date.
+- Labels: All labels assigned to the ticket.
+- Status: The current status of the ticket.
+- Creator: The user name of the Jira user who created the ticket.
+- Assignee: The user name of the Jira user who is assigned to the ticket.
+
+### Bug tickets
+
+The bug tickets section consists of three parts showing different bug ticket
+evaluations.
+
+The first block show the change of ticket count in the last week and the last
+month. The "created" value is the sum of all bug tickets with a created date
+in the last week or month. The "resolved" value is the sum of all bug tickets
+with a resolved date in the last week or month. The "diff" is the difference
+between the two values, i.e. the change in the bug count.
+
+The second block is a matrix listing the ticket number for each fix version and
+security level combination and a sum of the tickets for each security level.
+
+The third block is a table of all tickets grouped by fix version and security
+level. For each ticket the priority, the status, the created date, the key and
+the summary is displayed.
+
+### Features
+
+// TODO: fill
+
+### Improvements
+
+// TODO: fill
+
+### Other tickets
+
+// TODO: fill
+
+### Resources
+
+// TODO: fill
+
+### Warnings
+
+// TODO: fill
+
+## Config
+
+JiraTicketStats supports a configuration of different formats and external
+constants, e.g. ticket names. These values are internally stored in a config
+structure implemented in `config.go`. When the tool is executed, a file
+`config.json` is read form the current working directory. If this file doesn't
+exist it is created using default values.
+
+## Architecture
+
+JiraTicketStats is implemented using the package `ticketstats` and split in different
 Go files, grouping logical sections.
 
-## Data
+### Config
+
+JiraTicketStats is using Config data structures which groups different values,
+mostly strings, required during the processing steps and configured in Jira,
+e.g. type and state names. This is implemented in `config.go`.
+
+### Data
 
 It using two types of data models, one for evaluation implemented in `issue.go`,
 and one for rendering, implemented in `render.go`.
 
-### Config
+#### Parsing the data
 
-The tool use Config data structures which groups different values, mostly
-strings, required during the processing steps and configured in Jira, e.g. type
-and state names. This is implemented in `config.go`.
-
-### Parsing the data
-
-The tool reads the following field from the Jira export to the evaluation data
-type:
+JiraTicketStats reads the following field from the Jira export to the evaluation
+data type:
 
 - "Summary -> issue.Summary (string)
 - Issue key -> issue.Key (string)
@@ -108,3 +180,11 @@ into teh fields:
 
 The type Work is used to represent work hours. It is just a float64 with the
 unit work hours, not seconds as used by Jira.
+
+#### Generating the report
+
+// TODO: describe report data structures
+
+### Processing
+
+// TODO: write
