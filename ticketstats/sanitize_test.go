@@ -118,5 +118,24 @@ func TestSanitize(t *testing.T) {
 }
 
 func TestIgnoreOld(t *testing.T) {
-	t.Fail()
+	issues := make([]*Issue, 0)
+
+	issue := NewIssue()
+	issue.Key = "B"
+	issue.CustomActivity = "123457"
+
+	issue.LogWorks = append(issue.LogWorks, WorkLog{
+		Activity: "123456",
+		Hours:    1.5,
+		Date:     time.Now().AddDate(0, -2, 0),
+	})
+
+	issues = append(issues, issue)
+
+	result := Sanitize(issues, true, DefaultConfig())
+
+	if len(result.InvalidWorkLogs) != 0 {
+		log.Println("TEST: wrong count of issues with invalid bookings")
+		t.Fail()
+	}
 }
