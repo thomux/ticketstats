@@ -10,6 +10,7 @@ import (
 	"time"
 )
 
+// TicketStats groups all data of a program run.
 type TicketStats struct {
 	config    Config
 	jiraBase  string
@@ -19,7 +20,7 @@ type TicketStats struct {
 	ignoreOld bool
 }
 
-// Evaluate generates a full report for the exported tickets
+// Evaluate generates a full report for the exported tickets.
 func Evaluate(path string,
 	project string,
 	component string,
@@ -71,6 +72,7 @@ func Evaluate(path string,
 	}
 }
 
+// generateReport generates a full report.
 func (ts *TicketStats) generateReport() {
 	// Reduce to active tickets
 	ts.active = ActiveTickets(ts.issues, ts.config)
@@ -87,6 +89,7 @@ func (ts *TicketStats) generateReport() {
 	ts.report.Render(ts.config)
 }
 
+// sanitize checks if the tickets are valid and generate the Warnings report.
 func (ts *TicketStats) sanitize() {
 	// Check tickets for issues
 	result := Sanitize(ts.issues, ts.ignoreOld, ts.config)
@@ -96,6 +99,7 @@ func (ts *TicketStats) sanitize() {
 	}
 }
 
+// oldBugs generates the old bug report data.
 func (ts *TicketStats) oldBugs() {
 	oldBugs := OldBugs(ts.active, ts.config)
 
@@ -120,6 +124,7 @@ func (ts *TicketStats) oldBugs() {
 	log.Println("INFO:", len(oldBugs), "old bug tickets.")
 }
 
+// bugs generates the bug report data.
 func (ts *TicketStats) bugs() {
 	bugs := FilterByType(ts.issues, "Bug")
 	openBugs := OpenTickets(bugs, ts.config)
@@ -190,6 +195,7 @@ func (ts *TicketStats) bugs() {
 	}
 }
 
+// features generates the feature report data.
 func (ts *TicketStats) features() {
 	features := FilterByType(ts.issues, "New Feature")
 	openFeatures := OpenTickets(features, ts.config)
@@ -203,6 +209,7 @@ func (ts *TicketStats) features() {
 	}
 }
 
+// improvements generates the improvement report data.
 func (ts *TicketStats) improvements() {
 	improvements := FilterByType(ts.issues, "Improvement")
 	openImprovements := OpenTickets(improvements, ts.config)
@@ -216,6 +223,7 @@ func (ts *TicketStats) improvements() {
 	}
 }
 
+// other generates the other issue report data.
 func (ts *TicketStats) other() {
 	others := Filter(ts.issues, func(issue *Issue) bool {
 		return !(issue.Type == "Bug" || issue.Type == "New Feature" || issue.Type == "Improvement")
@@ -249,6 +257,7 @@ func (ts *TicketStats) other() {
 	}
 }
 
+// resources generates the work effort report data.
 func (ts *TicketStats) resources() {
 	ranges := []string{"Last week", "Last month", "Last quarter", "Last year"}
 	hours := calcHours(ts.issues)
@@ -345,6 +354,7 @@ func (ts *TicketStats) resources() {
 	ts.report.Resources.Average = append(ts.report.Resources.Average, averageQuarter, averageYear)
 }
 
+// calcHours calculates the work hours spend for the given tickets.
 func calcHours(issues []*Issue) []Work {
 	hours := make([]Work, 0)
 	hours = append(hours, WorkAfter(issues, time.Now().AddDate(0, 0, -7)))
@@ -354,6 +364,7 @@ func calcHours(issues []*Issue) []Work {
 	return hours
 }
 
+// calcFTE calculates the FTEs for given work hours.
 func calcFTE(hours []Work) []float64 {
 	fte := make([]float64, 0)
 	fte = append(fte, float64(hours[0]/40.0))
