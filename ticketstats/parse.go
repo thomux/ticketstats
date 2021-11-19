@@ -9,6 +9,7 @@ import (
 	"time"
 )
 
+// readCsvFile reads and parses a csv file from disk.
 func readCsvFile(filePath string) [][]string {
 	f, err := os.Open(filePath)
 	if err != nil {
@@ -28,6 +29,8 @@ func readCsvFile(filePath string) [][]string {
 	return records
 }
 
+// convertWork converts a Jira work value form the CSV export
+// (seconds as string) to Work (hours as float64)
 func convertWork(data string) Work {
 	secs, err := strconv.Atoi(data)
 	if err != nil {
@@ -38,8 +41,13 @@ func convertWork(data string) Work {
 	}
 }
 
-func convertWorkLog(data string) WorkLog {
-	// Log Work = [entry description (containing ExAc as ExecutionActivity:XXXXXX)];[Date];[user (always asw_qm_service)];[time spend as seconds]
+// convertWorkLog converts a Jira work log to an Worklog.
+// The expected format is:
+// [some text line(s)]
+// ExecutionActivity:<value used as activity>
+// [some more text line(s)]
+// [last line starting with text];[Date];[user (ignored)];[time spend (seconds)]
+func convertWorkLog(data string, config Config) WorkLog {
 	var hours Work
 	var date time.Time
 	var exAc string
@@ -61,7 +69,7 @@ func convertWorkLog(data string) WorkLog {
 	// get date
 	tmp = tmp[:i]
 	i = strings.LastIndex(tmp, ";")
-	date = convertDate(tmp[i+1:])
+	date = convertDate(tmp[i+1:], config)
 
 	return WorkLog{
 		Hours:    hours,
@@ -70,9 +78,10 @@ func convertWorkLog(data string) WorkLog {
 	}
 }
 
-func convertDate(data string) time.Time {
-	layout := "02/Jan/06 3:04 PM"
-	t, err := time.Parse(layout, data)
+// convertDate converts a date string to a time.Time.
+// The expected format is "02/Jan/06 3:04 PM".
+func convertDate(data string, config Config) time.Time {
+	t, err := time.Parse(config.Formats.JiraDate, data)
 	if err != nil {
 		log.Println("ERROR:", err)
 		return time.Time{}
@@ -80,6 +89,9 @@ func convertDate(data string) time.Time {
 	return t
 }
 
+// Parse parse the CSV data form path as a list if issues.
+// This function maps the Jira CSV records to the internal
+// Issue data objects.
 func Parse(path string, config Config) []*Issue {
 	records := readCsvFile("JiraExport.csv")
 
@@ -119,11 +131,11 @@ func Parse(path string, config Config) []*Issue {
 			case "Creator":
 				issue.Creator = val
 			case "Created":
-				issue.Created = convertDate(val)
+				issue.Created = convertDate(val, config)
 			case "Updated":
-				issue.Updated = convertDate(val)
+				issue.Updated = convertDate(val, config)
 			case "Last Viewed":
-				issue.LastViewed = convertDate(val)
+				issue.LastViewed = convertDate(val, config)
 			case "Affects Version/s":
 				issue.AffectsVersions = append(issue.AffectsVersions, val)
 			case "Fix Version/s":
@@ -131,7 +143,8 @@ func Parse(path string, config Config) []*Issue {
 			case "Component/s":
 				issue.Components = append(issue.Components, val)
 			case "Log Work":
-				issue.LogWorks = append(issue.LogWorks, convertWorkLog(val))
+				issue.LogWorks = append(issue.LogWorks,
+					convertWorkLog(val, config))
 			case "Original Estimate":
 				issue.OriginalEstimate = convertWork(val)
 			case "Remaining Estimate":
@@ -151,9 +164,9 @@ func Parse(path string, config Config) []*Issue {
 			case "Resolution":
 				issue.Resolution = val
 			case "Resolved":
-				issue.Resolved = convertDate(val)
+				issue.Resolved = convertDate(val, config)
 			case "Due Date":
-				issue.Due = convertDate(val)
+				issue.Due = convertDate(val, config)
 			case "Outward issue link (Blocks)":
 				issue.LinkBlocks = append(issue.LinkBlocks, val)
 			case "Outward issue link (Causes)":

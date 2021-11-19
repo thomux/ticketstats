@@ -11,7 +11,8 @@ type Config struct {
 
 // ConfigFormats groups format strings.
 type ConfigFormats struct {
-	Date string
+	Date     string
+	JiraDate string
 }
 
 // ConfigTypeNames groups the type name strings.
@@ -43,6 +44,7 @@ func DefaultConfig() Config {
 	config.Template = ""
 
 	config.Formats.Date = "2006-01-02"
+	config.Formats.JiraDate = "02/Jan/06 3:04 PM"
 
 	config.Types.Bug = "Bug"
 	config.Types.Feature = "New Feature"
