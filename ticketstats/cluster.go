@@ -98,6 +98,21 @@ func ClusterIssues(issues []*Issue) {
 	}
 }
 
+// Clusters returns all issue clusters.
+// If needsChilds is true, issue without childs are not part of the result.
+func Clusters(issues []*Issue, needsChilds bool) []*Issue {
+	clusters := make([]*Issue, 0)
+	for _, issue := range issues {
+		if needsChilds && len(issue.Childs) == 0 {
+			continue
+		}
+		if len(issue.Parents) == 0 {
+			clusters = append(clusters, issue)
+		}
+	}
+	return clusters
+}
+
 // linkParentsRecursive creates the backward links for the child issues.
 func linkParentsRecursive(issue *Issue) {
 	for _, child := range issue.Childs {
@@ -138,9 +153,9 @@ func removeDuplicates(issues []*Issue, set map[string]*Issue) []*Issue {
 // PrintClusters print the "clusters" contained in the given issue list,
 // i.e. if a issue has childs, the whole tree is printed, if a issue has
 // no childs, it is skipped.
-func PrintClusters(issues []*Issue) {
+func PrintClusters(issues []*Issue, config Config) {
 	i := 1
-	for _, issue := range issues {
+	for _, issue := range Clusters(OpenTickets(issues, config), true) {
 		if len(issue.Parents) > 0 {
 			continue
 		}

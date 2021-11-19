@@ -40,7 +40,7 @@ func Evaluate(path string,
 	}
 
 	ClusterIssues(issues)
-	PrintClusters(issues)
+	PrintClusters(issues, config)
 
 	ts := TicketStats{
 		config:   config,
@@ -193,7 +193,7 @@ func (ts *TicketStats) features() {
 	openFeatures := OpenTickets(features, ts.config)
 	OrderByDue(openFeatures)
 
-	for _, feature := range openFeatures {
+	for _, feature := range Clusters(openFeatures, false) {
 		rf := feature.ToReportIssue(ts.jiraBase)
 		if len(rf.Parents) == 0 {
 			ts.report.Features = append(ts.report.Features, rf)
@@ -206,7 +206,7 @@ func (ts *TicketStats) improvements() {
 	openImprovements := OpenTickets(improvements, ts.config)
 	OrderByDue(openImprovements)
 
-	for _, improvement := range openImprovements {
+	for _, improvement := range Clusters(openImprovements, false) {
 		ri := improvement.ToReportIssue(ts.jiraBase)
 		if len(ri.Parents) == 0 {
 			ts.report.Improvements = append(ts.report.Improvements, ri)

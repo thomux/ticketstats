@@ -352,3 +352,61 @@ func TestRemoveDuplicateChildsRecursive(t *testing.T) {
 		t.Fail()
 	}
 }
+
+func TestClusters(t *testing.T) {
+	issues := make([]*Issue, 0)
+
+	issueA := NewIssue()
+	issueA.Key = "A"
+	issues = append(issues, issueA)
+
+	issueB := NewIssue()
+	issueB.Key = "B"
+	issues = append(issues, issueB)
+
+	issueC := NewIssue()
+	issueC.Key = "C"
+	issueC.Childs = append(issueC.Childs, issueA, issueB)
+	issues = append(issues, issueC)
+
+	issueD := NewIssue()
+	issueD.Key = "D"
+	issues = append(issues, issueD)
+
+	issueE := NewIssue()
+	issueE.Key = "E"
+	issueE.Childs = append(issueE.Childs, issueC)
+	issues = append(issues, issueE)
+
+	issueF := NewIssue()
+	issueF.Key = "F"
+	issueF.Childs = append(issueF.Childs, issueD, issueE)
+	issues = append(issues, issueF)
+
+	linkParentsRecursive(issueF)
+
+	issueG := NewIssue()
+	issueG.Key = "G"
+	issues = append(issues, issueG)
+
+	clusters := Clusters(issues, false)
+
+	if len(clusters) != 2 {
+		t.Fail()
+	}
+	if clusters[0].Key != "F" {
+		t.Fail()
+	}
+	if clusters[1].Key != "G" {
+		t.Fail()
+	}
+
+	clusters = Clusters(issues, true)
+
+	if len(clusters) != 1 {
+		t.Fail()
+	}
+	if clusters[0].Key != "F" {
+		t.Fail()
+	}
+}
