@@ -27,7 +27,12 @@ JiraTicketStats supports the following parameters:
 
 ## Example
 
-// TODO: write
+The file `exmple.data` contains some example issues. You can generate a example
+test record with the command:
+
+``` bash
+go run . -csv example.data
+```
 
 ## Report
 
@@ -53,10 +58,14 @@ than 30 days. For each ticket the following data is displayed:
 - Creator: The user name of the Jira user who created the ticket.
 - Assignee: The user name of the Jira user who is assigned to the ticket.
 
+![OldBugs.png](images/OldBugs.png)
+
 ### Bug tickets
 
 The bug tickets section consists of three parts showing different bug ticket
 evaluations.
+
+![OldBugs.png](images/BugTickets.png)
 
 The first block show the change of ticket count in the last week and the last
 month. The "created" value is the sum of all bug tickets with a created date
@@ -64,12 +73,18 @@ in the last week or month. The "resolved" value is the sum of all bug tickets
 with a resolved date in the last week or month. The "diff" is the difference
 between the two values, i.e. the change in the bug count.
 
+![OldBugs.png](images/BugTicketsBlock1.png)
+
 The second block is a matrix listing the ticket number for each fix version and
 security level combination and a sum of the tickets for each security level.
+
+![OldBugs.png](images/BugTicketsBlock2.png)
 
 The third block is a table of all tickets grouped by fix version and security
 level. For each ticket the priority, the status, the created date, the key and
 the summary is displayed.
+
+![OldBugs.png](images/BugTicketsBlock3.png)
 
 ### Features
 
