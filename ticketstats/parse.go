@@ -93,7 +93,7 @@ func convertDate(data string, config Config) time.Time {
 // This function maps the Jira CSV records to the internal
 // Issue data objects.
 func Parse(path string, config Config) []*Issue {
-	records := readCsvFile("JiraExport.csv")
+	records := readCsvFile(path)
 
 	header := records[0]
 	data := records[1:]
