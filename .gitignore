@@ -1,6 +1,7 @@
 *.csv
 report*.html
 *.pdf
+JiraTicketStats*
 
 # Created by https://www.toptal.com/developers/gitignore/api/visualstudiocode,macos,linux,windows,go
 # Edit at https://www.toptal.com/developers/gitignore?templates=visualstudiocode,macos,linux,windows,go
