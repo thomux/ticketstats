@@ -34,6 +34,10 @@ test record with the command:
 go run . -csv example.data
 ```
 
+This will generate a the reports `report_.html` (all tickets) and the module
+report `report_Module A.html`. To generate just a module report, the parameter
+`component` can be used.
+
 ## Report
 
 The output of JiraTicketStats is an HTML report containing the following sections:
@@ -88,40 +92,68 @@ the summary is displayed.
 
 ### Features
 
-// TODO: fill
+The features section show a table containing all active feature tickets. Linked
+tickets are clustered. For each ticket the following information is displayed:
+
+- Key
+- Summary
+- Status
+- Fix Versions
+- Due
+- Time spend: Booked hours for the Jira ticket.
+- Estimate: Estimated hours for the ticket.
+- Progress: The ticket progress, calculated using time spend and the estimate.
+- FTE: The necessary FTEs to do the remaining work while keeping the due date.
 
 ![Features.png](images/Features.png)
 
 ### Improvements
 
-// TODO: fill
+The improvements section shows the same information as the features section, but
+for the ticket type "Improvement" (config.Types.Improvement).
 
 ![Improvements.png](images/Improvements.png)
 
 ### Other tickets
 
-// TODO: fill
+The other tickets section gives a small overview over the ticket count changes
+for the other ticket types, e.g. "Task" or "Sub-Task" 
 
 ![OtherTickets.png](images/OtherTickets.png)
 
-
 ### Resources
 
-// TODO: fill
+The resources section provides different evaluations of the spend work hours. 
 
 ![Resources.png](images/Resources.png)
 
+The first block gives an overview about the spend work hours and for which types
+and labels these hours were spend. The evaluated time ranges are last week,
+last month, last quarter and last year.
+
 ![ResourcesBlock1.png](images/ResourcesBlock1.png)
+
+The second block gives an overview about the average (median an mean) work time
+for each ticket type. The evaluation considers all tickets with booked hours
+(time spend > 0) which were closed during the last quarter and during the last
+year.
 
 ![ResourcesBlock2.png](images/ResourcesBlock2.png)
 
 ### Warnings
 
-// TODO: fill
+The warnings section gives and overview of all tickets with sanitize check
+issues.
 
 ![Warnings.png](images/Warnings.png)
 
+The first block shows all tickets without an assigned activity.
+
 ![WarningsBlock1.png](images/WarningsBlock1.png)
+
+The second block shows all tickets with invalid work logs. A work log is
+considered invalid if the ticket has an assigned activity and the activity of
+a work log doesn't match this activity.
 
 ![WarningsBlock2.png](images/WarningsBlock2.png)
 
@@ -217,8 +249,13 @@ unit work hours, not seconds as used by Jira.
 
 #### Generating the report
 
-// TODO: describe report data structures
+For generating the report different types are used, supporting rendered values,
+e.g. string instead of time.Time for dates. The data types for rendering are
+defined in `render.go`. The main render function is `Issue.ToReportIssue` which
+transforms an Issue to its report representation.
 
-### Processing
+The statistic calculations are implemented in `stats.go`.
 
-// TODO: write
+The main logic, for parsing the data, generating the data for the different
+report sections and the rendering of the report is implemented in
+`ticketstats.go`.
