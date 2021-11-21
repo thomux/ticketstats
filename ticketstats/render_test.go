@@ -1,6 +1,7 @@
 package ticketstats
 
 import (
+	"math"
 	"testing"
 	"time"
 )
@@ -217,7 +218,7 @@ func TestFlattenTree(t *testing.T) {
 
 func TestCovertToFTE(t *testing.T) {
 	fte := covertToFTE(time.Now().AddDate(0, 0, 14), Work(40.0))
-	if fte != "0.50" {
+	if math.Abs(fte-0.5) > 0.001 {
 		t.Fail()
 	}
 }

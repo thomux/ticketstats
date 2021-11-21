@@ -263,9 +263,11 @@ func (issue *Issue) ToReportIssue(jiraBaseUrl string,
 		rissue.HasDue = true
 		rissue.Due = issue.Due.Format(config.Formats.Date)
 		if issue.OriginalEstimate > 0.1 {
-			rissue.FTE = covertToFTE(issue.Due,
+			fte := covertToFTE(issue.Due,
 				issue.OriginalEstimate-issue.TimeSpend)
+			rissue.FTE = fmt.Sprintf("%.2f", fte)
 			rissue.HasEstimate = true
+			rissue.AtRisk = fte > 1.0
 		}
 	}
 	if issue.Created != noDate {
@@ -324,13 +326,13 @@ func flattenTree(issue *Issue, parent Link,
 }
 
 // covertToFTE calculates the needed FTEs based on the remaining days.
-func covertToFTE(due time.Time, remainingEffort Work) string {
+func covertToFTE(due time.Time, remainingEffort Work) float64 {
 	neededDays := float64(remainingEffort) / 8.0
 	remainingTime := time.Until(due)
 	remainingWeeks := (remainingTime.Hours() / 24.0) / 7.0
 	remainingDays := remainingWeeks * 5
 	fte := neededDays / float64(remainingDays)
-	return fmt.Sprintf("%.2f", fte)
+	return fte
 }
 
 // convertToAge calculates the age of days of an issue.

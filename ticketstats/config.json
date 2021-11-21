@@ -1,0 +1,30 @@
+{
+  "Template": "",
+  "Component": "",
+  "Project": "",
+  "Types": {
+    "Feature": "New Feature",
+    "Bug": "Bug",
+    "Improvement": "Improvement"
+  },
+  "States": {
+    "Closed": "Closed",
+    "BugFilter": [
+      "Verification",
+      "Acceptace",
+      "Integration",
+      "Closed"
+    ]
+  },
+  "Customs": {
+    "ExternalId": "Custom field (External ID)",
+    "SupplierReference": "Custom field (Supplier reference)",
+    "Variant": "Custom field (ICAS Variant)",
+    "Account": "Custom field (Booking Account)",
+    "Category": "Custom field (Bug-Category)"
+  },
+  "Formats": {
+    "Date": "2006-01-02",
+    "JiraDate": "02/Jan/06 3:04 PM"
+  }
+}
