@@ -55,7 +55,12 @@ func convertWorkLog(data string, config Config) WorkLog {
 	lines := strings.Split(data, "\n")
 	for _, line := range lines {
 		if strings.HasPrefix(line, "ExecutionActivity:") {
-			exAc = line[18:]
+			end := strings.Index(line, ";")
+			if end > 0 {
+				exAc = line[18:end]
+			} else {
+				exAc = line[18:]
+			}
 		}
 	}
 
