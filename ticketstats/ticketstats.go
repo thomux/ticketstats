@@ -206,8 +206,9 @@ func (ts *TicketStats) features() {
 	features := FilterByType(ts.issues, ts.config.Types.Feature)
 	openFeatures := OpenTickets(features, ts.config)
 	OrderByDue(openFeatures)
+	cluster := Clusters(openFeatures, false)
 
-	for _, feature := range Clusters(openFeatures, false) {
+	for _, feature := range cluster {
 		rf := feature.ToReportIssue(ts.jiraBase, ts.config)
 		if len(rf.Parents) == 0 {
 			ts.report.Features = append(ts.report.Features, rf)
